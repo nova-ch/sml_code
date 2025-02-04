@@ -4,7 +4,7 @@ import time
 import logging
 from scout_ml_package.utils.demo import DummyData, DataValidator, FakeListener
 from scout_ml_package.model.model_pipeline import ModelManager, PredictionPipeline
-
+from scout_ml_package.data.fetch_data import get_db_connection, fetch_task_param
 # Configure logging only once at the start of your script
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -82,11 +82,15 @@ if __name__ == "__main__":
     model_manager = ModelManager(base_path)
     model_manager.load_models()
 
+    # Establish connection
+    conn = get_db_connection()
+
     sample_tasks = [27766704, 27746332]
     listener = FakeListener(sample_tasks, delay=3)  # Pass delay here
     for jeditaskid in listener.demo_task_listener():  # No arguments needed here
         print(f"Received JEDITASKID: {jeditaskid}")
-        r = df[df['JEDITASKID'] == jeditaskid].copy()
+        r= fetch_task_param(jeditaskids, conn)
+        #r = df[df['JEDITASKID'] == jeditaskid].copy()
         print(r)
         result = get_prediction(model_manager, r)
         if result is not None:

@@ -1,7 +1,17 @@
 # Python bytecode
 __pycache__/
 *.py[cod]
+# Ignore macOS system files
+.DS_Store
 
+# Ignore all files in the ModelStorage directory
+src/ModelStorage/
+
+# Ignore logs directory
+src/logs/
+
+# Ignore merged_files directory
+src/merged_files/
 # Virtual environment
 venv/
 ENV/
