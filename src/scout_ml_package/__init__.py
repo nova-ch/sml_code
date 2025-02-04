@@ -5,6 +5,7 @@ from .model.base_model import MultiOutputModel, ModelTrainer, TrainedModel, Mode
 from .data.data_manager import (HistoricalDataProcessor, DataSplitter,
                                 ModelTrainingInput, CategoricalEncoder, BaseDataPreprocessor,
                                 TrainingDataPreprocessor, NewDataPreprocessor, LiveDataPreprocessor)
+from .data.fetch_db_data import DatabaseFetcher
 from .model.model_pipeline import TrainingPipeline,  ModelHandlerInProd #ModelLoader,
 from .utils.plotting import ErrorMetricsPlotter, ClassificationMetricsPlotter
 from .utils.demo import FakeListener, DummyData, DataValidator
@@ -30,6 +31,7 @@ __all__ = [
     'LiveDataPreprocessor',
     'ModelHandlerInProd',
 'FakeListener', 'DummyData', 'DataValidator'
+    ,'DatabaseFetcher'
 ]
 
 # Optional: Example of initializing common configurations

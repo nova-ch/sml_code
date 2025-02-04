@@ -82,14 +82,14 @@ if __name__ == "__main__":
     model_manager = ModelManager(base_path)
     model_manager.load_models()
 
-    # Establish connection
-    conn = get_db_connection()
+    db_fetcher = DatabaseFetcher()
+
 
     sample_tasks = [27766704, 27746332]
     listener = FakeListener(sample_tasks, delay=3)  # Pass delay here
     for jeditaskid in listener.demo_task_listener():  # No arguments needed here
         print(f"Received JEDITASKID: {jeditaskid}")
-        r= fetch_task_param(jeditaskids, conn)
+        r= db_fetcher.fetch_task_param(jeditaskids)
         #r = df[df['JEDITASKID'] == jeditaskid].copy()
         print(r)
         result = get_prediction(model_manager, r)
