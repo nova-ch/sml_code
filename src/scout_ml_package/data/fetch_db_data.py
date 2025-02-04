@@ -15,9 +15,9 @@ class DatabaseFetcher:
         config = configparser.ConfigParser()
 
         # Get the directory of the current script and construct path to config.ini
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        config_path = os.path.join(current_dir, '..', 'config.ini')  # Adjust path if necessary
-
+        #current_dir = os.path.dirname(os.path.abspath(__file__))
+        #config_path = os.path.join(current_dir, '..', 'config.ini')  # Adjust path if necessary
+        config_path = os.path.join( "/data/model-data/configs",'','config.ini')
         print(f"Config file path: {config_path}")
         print(f"Config file exists: {os.path.exists(config_path)}")
 
