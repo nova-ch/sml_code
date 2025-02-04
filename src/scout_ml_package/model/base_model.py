@@ -72,6 +72,22 @@ class MultiOutputModel:
         self.model = model
         return model
 
+    def test_build(self) -> Model:
+        inputs = Input(shape=(self.input_shape,))
+        x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
+
+        x = self._add_conv_block(x, filters=256, kernel_size=3, activation='elu', pool_size=2)
+        x = Flatten()(x)
+        #x = self._add_dense_block(x, units=256, dropout_rate=0.4, activation='elu')
+
+        outputs = Dense(self.output_shape, activation='relu')(x)
+        model = Model(inputs, outputs)
+
+        model.compile(optimizer=self.optimizer, loss=self.loss_function,
+                      metrics=['mean_absolute_error'])
+        self.model = model
+        return model
+
     def _add_conv_block(self, x: tf.Tensor, filters: int, kernel_size: int, activation: str = 'relu',
                         pool_size: int = 2) -> tf.Tensor:
         """Add a convolutional block to the model."""
