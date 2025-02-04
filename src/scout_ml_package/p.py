@@ -89,7 +89,7 @@ if __name__ == "__main__":
     listener = FakeListener(sample_tasks, delay=3)  # Pass delay here
     for jeditaskid in listener.demo_task_listener():  # No arguments needed here
         print(f"Received JEDITASKID: {jeditaskid}")
-        r= db_fetcher.fetch_task_param(jeditaskids)
+        r= db_fetcher.fetch_task_param(jeditaskid)
         #r = df[df['JEDITASKID'] == jeditaskid].copy()
         print(r)
         result = get_prediction(model_manager, r)
