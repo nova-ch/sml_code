@@ -8,11 +8,13 @@ import joblib
 # Assuming you have a HistoricalDataProcessor instance and you want to get the merged_data
 # processor = HistoricalDataProcessor(task_data_path='path/to/task_data.parquet',
 #                                      additional_data_path='path/to/additional_data.parquet')
-
-task_train_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/training_historial.parquet'
+base_path = "/data/test/"
+#task_train_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/training_historial.parquet'
+task_train_data_path = '/data/test/merged_files/training_historial.parquet'
 processor = HistoricalDataProcessor(task_train_data_path)
 
-task_new_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/new_historial.parquet'
+#task_new_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/new_historial.parquet'
+task_new_data_path = '/data/test/merged_files/new_historial.parquet'
 new_preprocessor = HistoricalDataProcessor(task_new_data_path)
 # Filter the data
 training_data = processor.filtered_data()
@@ -82,7 +84,7 @@ model_seq = "1"
 target_name = "ramcount"
 model_storage_path = f"ModelStorage/model{model_seq}/"  # Define the storage path
 model_name = f"model{model_seq}_{target_name}"  # Define the model name
-plot_directory_name = f'ModelStorage/plots/model{model_seq}'#'my_plots'  # Optional: specify a custom plots directory
+plot_directory_name = f'/data/test/ModelStorage/plots/model{model_seq}'#'my_plots'  # Optional: specify a custom plots directory
 
 joblib.dump(fitted_scalar, f'{model_storage_path}/scaler.pkl')
 model_full_path = model_storage_path+model_name
@@ -112,28 +114,3 @@ model = TFSMLayer(model_full_path, call_endpoint='serving_default')
 predictions = model(processed_future_data[features_to_train])
 print(predictions)
 
-#
-# import psutil
-#
-# def print_memory_usage():
-#     # Get total memory
-#     total_memory = psutil.virtual_memory().total
-#     # Get available memory
-#     available_memory = psutil.virtual_memory().available
-#     # Get used memory
-#     used_memory = psutil.virtual_memory().used
-#     # Get the number of logical cores
-#     num_cores = psutil.cpu_count(logical=True)
-#
-#     print(f"Total Memory: {total_memory / (1024 ** 3):.2f} GB")
-#     print(f"Available Memory: {available_memory / (1024 ** 3):.2f} GB")
-#     print(f"Used Memory: {used_memory / (1024 ** 3):.2f} GB")
-#     print(f"Number of Logical Cores: {num_cores}")
-#
-#     # Get memory usage per core
-#     for i in range(num_cores):
-#         # Simulate/process memory usage per core (you can't get per core directly, just CPU usage per core)
-#         # Instead, this could refer to the process's memory usage which might span across cores.
-#         print(f"Core {i + 1}: Memory usage (approx.) for the process: {psutil.Process().memory_info().rss / (1024 ** 2):.2f} MB")
-#
-# print_memory_usage()
