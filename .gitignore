@@ -1,0 +1,23 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+ENV/
+env/
+.env
+
+# IDE files
+.idea/
+.vscode/
+
+# Log files
+*.log
+
+# Ignore compiled files
+*.o
+*.so
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints
