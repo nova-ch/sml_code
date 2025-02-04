@@ -8,13 +8,13 @@ import joblib
 # Assuming you have a HistoricalDataProcessor instance and you want to get the merged_data
 # processor = HistoricalDataProcessor(task_data_path='path/to/task_data.parquet',
 #                                      additional_data_path='path/to/additional_data.parquet')
-base_path = "/data/test/"
+base_path = "/data/model-data/"
 #task_train_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/training_historial.parquet'
-task_train_data_path = '/data/test/merged_files/training_historial.parquet'
+task_train_data_path = '/data/model-data/merged_files/training_historial.parquet'
 processor = HistoricalDataProcessor(task_train_data_path)
 
 #task_new_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/new_historial.parquet'
-task_new_data_path = '/data/test/merged_files/new_historial.parquet'
+task_new_data_path = '/data/model-data/merged_files/new_historial.parquet'
 new_preprocessor = HistoricalDataProcessor(task_new_data_path)
 # Filter the data
 training_data = processor.filtered_data()
@@ -77,14 +77,14 @@ processed_train_data, processed_test_data, processed_future_data, encoded_column
 features_to_train = encoded_columns + numerical_features
 
 tuned_model = pipeline.train_model(processed_train_data, processed_test_data, features_to_train,
-                                       'test_build', epoch=1, batch=128) #build_cputime
+                                       'test_build', epoch=100, batch=128) #build_cputime
 predictions, y_pred = pipeline.regression_prediction(tuned_model, processed_future_data, features_to_train)
 
 model_seq = "1"
 target_name = "ramcount"
-model_storage_path = f"/data/test/ModelStorage/model{model_seq}/"  # Define the storage path
+model_storage_path = f"/data/model-data/ModelStorage/model{model_seq}/"  # Define the storage path
 model_name = f"model{model_seq}_{target_name}"  # Define the model name
-plot_directory_name = f'/data/test/ModelStorage/plots/model{model_seq}'#'my_plots'  # Optional: specify a custom plots directory
+plot_directory_name = f'/data/model-data/ModelStorage/plots/model{model_seq}'#'my_plots'  # Optional: specify a custom plots directory
 
 joblib.dump(fitted_scalar, f'{model_storage_path}/scaler.pkl')
 model_full_path = model_storage_path+model_name
