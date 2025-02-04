@@ -82,7 +82,7 @@ predictions, y_pred = pipeline.regression_prediction(tuned_model, processed_futu
 
 model_seq = "1"
 target_name = "ramcount"
-model_storage_path = f"ModelStorage/model{model_seq}/"  # Define the storage path
+model_storage_path = f"/data/test/ModelStorage/model{model_seq}/"  # Define the storage path
 model_name = f"model{model_seq}_{target_name}"  # Define the model name
 plot_directory_name = f'/data/test/ModelStorage/plots/model{model_seq}'#'my_plots'  # Optional: specify a custom plots directory
 
@@ -110,6 +110,7 @@ plotter.plot_metrics()
 
 from keras.layers import TFSMLayer
 import tensorflow as tf
+print(model_full_path)
 model = TFSMLayer(model_full_path, call_endpoint='serving_default')
 predictions = model(processed_future_data[features_to_train])
 print(predictions)
