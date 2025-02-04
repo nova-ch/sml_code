@@ -77,7 +77,8 @@ def get_prediction(model_manager, r):
 
 if __name__ == "__main__":
     df = DummyData.fetch_data()
-    base_path = "/Users/tasnuvachowdhury/Desktop/PROD/pandaml-test/src/"
+    #base_path = "/Users/tasnuvachowdhury/Desktop/PROD/pandaml-test/src/"
+    base_path = "/data/test/"
     model_manager = ModelManager(base_path)
     model_manager.load_models()
 
