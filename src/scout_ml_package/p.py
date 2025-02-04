@@ -109,3 +109,4 @@ if __name__ == "__main__":
         # You can add any other actions you want to perform after waking up here
 
     print("All tasks processed")
+    db_fetcher.close_connection()
