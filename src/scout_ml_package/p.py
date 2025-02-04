@@ -4,7 +4,7 @@ import time
 import logging
 from scout_ml_package.utils.demo import DummyData, DataValidator, FakeListener
 from scout_ml_package.model.model_pipeline import ModelManager, PredictionPipeline
-from scout_ml_package.data.fetch_data import get_db_connection, fetch_task_param
+from scout_ml_package.data.fetch_data import DatabaseFetcher
 # Configure logging only once at the start of your script
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
