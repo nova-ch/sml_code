@@ -125,7 +125,7 @@ class MultiOutputModel:
         inputs = Input(shape=(self.input_shape,))
         x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
         x = self._add_conv_block(
-            x, filters=256, kernel_size=7, activation="relu", pool_size=2
+            x, filters=256, kernel_size=3, activation="relu", pool_size=2
         )
         x = self._add_conv_block(
             x, filters=128, kernel_size=5, activation="relu", pool_size=2
@@ -135,7 +135,7 @@ class MultiOutputModel:
             x, units=256, dropout_rate=0.5, activation="relu"
         )
         x = self._add_dense_block(
-            x, units=128, dropout_rate=0.2, activation="relu"
+            x, units=128, dropout_rate=0.3, activation="relu"
         )
         outputs = Dense(self.output_shape)(x)
         model = Model(inputs, outputs)
