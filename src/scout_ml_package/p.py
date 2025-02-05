@@ -9,16 +9,36 @@ from scout_ml_package.model.model_pipeline import (
 from scout_ml_package.data.fetch_db_data import DatabaseFetcher
 
 # Configure logging only once at the start of your script
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+# logging.basicConfig(
+#    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+# )
 logger = logging.getLogger(__name__)
 
 # Add a single handler
-handler = logging.StreamHandler()
+# handler = logging.StreamHandler()
+# formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+# handler.setFormatter(formatter)
+# logger.addHandler(handler)
+
+logger.setLevel(logging.INFO)
+
+# Create a formatter
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+
+# Add a StreamHandler to print logs to the console
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
+
+# Add a FileHandler to write logs to a file
+log_path = "/data/model-data/logs/prediction_pipeline.log"
+file_handler = logging.FileHandler(log_path)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+
+logger.info("Logging test: This should appear in both console and file.")
+
 # Define acceptable ranges for each prediction
 acceptable_ranges = {
     # Adjust these ranges based on your domain knowledge
@@ -28,99 +48,114 @@ acceptable_ranges = {
 }
 
 
-start_time = time.time()
-
-
 def get_prediction(model_manager, r):
     start_time = time.time()
 
     try:
         if r is not None:
-            jeditaskid = r["JEDITASKID"].values[0]
-            processor = PredictionPipeline(model_manager)
-            base_df = processor.preprocess_data(r)
+            # Check if DataFrame is not empty before accessing elements
+            if not r.empty:
+                jeditaskid = r["JEDITASKID"].values[0]
+                processor = PredictionPipeline(model_manager)
+                base_df = processor.preprocess_data(r)
 
-            # Model 1: RAMCOUNT
-            features = (
-                ["JEDITASKID"]
-                + processor.numerical_features
-                + processor.category_sequence
-            )
-            base_df.loc[:, "RAMCOUNT"] = processor.make_predictions_for_model(
-                "1", features, base_df
-            )
-            DataValidator.check_predictions(
-                base_df, "RAMCOUNT", acceptable_ranges
-            )
-
-            # Model 2 and 3: cputime_HS
-            processor.numerical_features.append("RAMCOUNT")
-            features = (
-                ["JEDITASKID"]
-                + processor.numerical_features
-                + processor.category_sequence
-            )
-
-            if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
-                base_df.loc[:, "cputime_HS"] = (
+                # Model 1: RAMCOUNT
+                features = (
+                    ["JEDITASKID"]
+                    + processor.numerical_features
+                    + processor.category_sequence
+                )
+                base_df.loc[:, "RAMCOUNT"] = (
                     processor.make_predictions_for_model(
-                        "2", features, base_df
+                        "1", features, base_df
                     )
                 )
+                DataValidator.check_predictions(
+                    base_df, "RAMCOUNT", acceptable_ranges
+                )
+
+                # Model 2 and 3: cputime_HS
+                processor.numerical_features.append("RAMCOUNT")
+                features = (
+                    ["JEDITASKID"]
+                    + processor.numerical_features
+                    + processor.category_sequence
+                )
+
+                if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
+                    base_df.loc[:, "cputime_HS"] = (
+                        processor.make_predictions_for_model(
+                            "2", features, base_df
+                        )
+                    )
+                else:
+                    base_df.loc[:, "cputime_HS"] = (
+                        processor.make_predictions_for_model(
+                            "3", features, base_df
+                        )
+                    )
+                DataValidator.check_predictions(
+                    base_df, "cputime_HS", acceptable_ranges
+                )
+
+                # Model 4: CPU_EFF
+                processor.numerical_features.append("cputime_HS")
+                features = (
+                    ["JEDITASKID"]
+                    + processor.numerical_features
+                    + processor.category_sequence
+                )
+                base_df.loc[:, "CPU_EFF"] = (
+                    processor.make_predictions_for_model(
+                        "4", features, base_df
+                    )
+                )
+                DataValidator.check_predictions(
+                    base_df, "CPU_EFF", acceptable_ranges
+                )
+
+                # Model 5: IOINTENSITY
+                processor.numerical_features.append("CPU_EFF")
+                features = (
+                    ["JEDITASKID"]
+                    + processor.numerical_features
+                    + processor.category_sequence
+                )
+                base_df.loc[:, "IOINTENSITY"] = (
+                    processor.make_predictions_for_model(
+                        "5", features, base_df
+                    )
+                )
+
+                logging.info(
+                    f"JEDITASKID {jeditaskid} processed successfully in {time.time() - start_time:.2f} seconds"
+                )
+                return base_df
+
             else:
-                base_df.loc[:, "cputime_HS"] = (
-                    processor.make_predictions_for_model(
-                        "3", features, base_df
-                    )
-                )
-            DataValidator.check_predictions(
-                base_df, "cputime_HS", acceptable_ranges
-            )
-
-            # Model 4: CPU_EFF
-            processor.numerical_features.append("cputime_HS")
-            features = (
-                ["JEDITASKID"]
-                + processor.numerical_features
-                + processor.category_sequence
-            )
-            base_df.loc[:, "CPU_EFF"] = processor.make_predictions_for_model(
-                "4", features, base_df
-            )
-            DataValidator.check_predictions(
-                base_df, "CPU_EFF", acceptable_ranges
-            )
-
-            # Model 5: IOINTENSITY
-            processor.numerical_features.append("CPU_EFF")
-            features = (
-                ["JEDITASKID"]
-                + processor.numerical_features
-                + processor.category_sequence
-            )
-            base_df.loc[:, "IOINTENSITY"] = (
-                processor.make_predictions_for_model("5", features, base_df)
-            )
-
-            logging.info(
-                f"JEDITASKID {jeditaskid} processed successfully in {time.time() - start_time:.2f} seconds"
-            )
-            return base_df
+                logger.error("DataFrame is empty for JEDITASKID.")
+                return None
 
         else:
-            logging.error("Failed to process: Input data is None")
+            logger.error("Failed to process: Input data is None")
             return None
 
+    except IndexError as ie:
+        logger.error(f"IndexError occurred: {ie}")
+        return None
+
     except ValueError as ve:
-        logging.error(
-            f"Check failed for JEDITASKID {r['JEDITASKID'].values[0] if r is not None else 'Unknown'}: {ve}"
+        jeditaskid = (
+            "Unknown" if r is None or r.empty else r["JEDITASKID"].values[0]
         )
+        logger.error(f"Check failed for JEDITASKID {jeditaskid}: {ve}")
         return None
 
     except Exception as e:
-        logging.error(
-            f"Error processing JEDITASKID {r['JEDITASKID'].values[0] if r is not None else 'Unknown'}: {str(e)}"
+        jeditaskid = (
+            "Unknown" if r is None or r.empty else r["JEDITASKID"].values[0]
         )
+        logger.error(f"Error processing JEDITASKID {jeditaskid}: {str(e)}")
         return None
 
 
