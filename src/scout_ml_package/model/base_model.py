@@ -120,26 +120,30 @@ class MultiOutputModel:
         )
         self.model = model
         return model
+
     def build_ramcount(self) -> Model:
         inputs = Input(shape=(self.input_shape,))
         x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
         x = self._add_conv_block(
-            x, filters=256, kernel_size=7, activation='relu', pool_size=2
+            x, filters=256, kernel_size=7, activation="relu", pool_size=2
         )
         x = self._add_conv_block(
-            x, filters=128, kernel_size=5, activation='relu', pool_size=2
+            x, filters=128, kernel_size=5, activation="relu", pool_size=2
         )
         x = Flatten()(x)
         x = self._add_dense_block(
-            x, units=256, dropout_rate=0.5,activation='relu'
+            x, units=256, dropout_rate=0.5, activation="relu"
         )
         x = self._add_dense_block(
-            x, units=128, dropout_rate=0.2, activation='relu'
+            x, units=128, dropout_rate=0.2, activation="relu"
         )
         outputs = Dense(self.output_shape)(x)
         model = Model(inputs, outputs)
-        model.compile(optimizer=self.optimizer, loss=self.loss_function,
-                      metrics=['mean_absolute_error'])
+        model.compile(
+            optimizer=self.optimizer,
+            loss=self.loss_function,
+            metrics=["mean_absolute_error"],
+        )
         self.model = model
         return model
 

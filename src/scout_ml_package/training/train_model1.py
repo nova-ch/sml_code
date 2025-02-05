@@ -1,5 +1,8 @@
 # src/scout_ml_package/train_model.py
-
+import pandas as pd
+import joblib
+import re
+import numpy as np
 from keras.layers import TFSMLayer
 from scout_ml_package.data import (
     HistoricalDataProcessor,
@@ -10,17 +13,17 @@ from scout_ml_package.model.model_pipeline import (
     TrainingPipeline,
 )  # ,ModelLoader
 from scout_ml_package.utils import ErrorMetricsPlotter
-import joblib
 
 # Assuming you have a HistoricalDataProcessor instance and you want to get the merged_data
 # processor = HistoricalDataProcessor(task_data_path='path/to/task_data.parquet',
 #                                      additional_data_path='path/to/additional_data.parquet')
 
+
 def preprocess_data(df):
     # Convert PROCESSINGTYPE to 'P'
     def convert_processingtype(processingtype):
-        if processingtype is not None and re.search(r'-.*-', processingtype):
-            return '-'.join(processingtype.split('-')[-2:])
+        if processingtype is not None and re.search(r"-.*-", processingtype):
+            return "-".join(processingtype.split("-")[-2:])
         return processingtype
 
     # Convert TRANSHOME to 'F'
@@ -29,53 +32,71 @@ def preprocess_data(df):
         if transhome is None:
             return None  # or handle as needed
 
-        if 'AnalysisBase' in transhome:
-            return 'AnalysisBase'
-        elif 'AnalysisTransforms-' in transhome:
+        if "AnalysisBase" in transhome:
+            return "AnalysisBase"
+        elif "AnalysisTransforms-" in transhome:
             # Extract the part after 'AnalysisTransforms-'
-            part_after_dash = transhome.split('-')[1]
-            return part_after_dash.split('_')[0]  # Assuming you want the first part before any underscore
-        elif '/' in transhome:
+            part_after_dash = transhome.split("-")[1]
+            return part_after_dash.split("_")[
+                0
+            ]  # Assuming you want the first part before any underscore
+        elif "/" in transhome:
             # Handle cases like AthGeneration/2022-11-09T1600
-            return transhome.split('/')[0]
+            return transhome.split("/")[0]
         else:
             # For all other cases, split by '-', return the first segment
-            return transhome.split('-')[0]
+            return transhome.split("-")[0]
 
     # Convert CORECOUNT to 'Core'
     def convert_corecount(corecount):
-        return 'S' if corecount == 1 else 'M'
+        return "S" if corecount == 1 else "M"
 
     # Apply transformations
-    df['P'] = df['PROCESSINGTYPE'].apply(convert_processingtype)
-    df['F'] = df['TRANSHOME'].apply(convert_transhome)
+    df["P"] = df["PROCESSINGTYPE"].apply(convert_processingtype)
+    df["F"] = df["TRANSHOME"].apply(convert_transhome)
 
-    df['CTIME'] = np.where(
-        df['CPUTIMEUNIT'] == 'mHS06sPerEvent',
-        df['CPUTIME'] / 1000,
-        np.where(
-            df['CPUTIMEUNIT'] == 'HS06sPerEvent',
-            df['CPUTIME'],
-            None
-        )
+    df["CTIME"] = np.where(
+        df["CPUTIMEUNIT"] == "mHS06sPerEvent",
+        df["CPUTIME"] / 1000,
+        np.where(df["CPUTIMEUNIT"] == "HS06sPerEvent", df["CPUTIME"], None),
     )
 
-    KEEP_F_TAG = ['Athena', 'AnalysisBase', 'AtlasOffline', 'AthAnalysis', 'AthSimulation', 'MCProd', 'AthGeneration',
-                  'AthDerivation']
-    KEEP_P_TAG = ['jedi-run', 'deriv', 'athena-trf', 'jedi-athena', 'simul', 'pile', 'merge', 'evgen', 'reprocessing',
-                  'recon', 'eventIndex']
+    KEEP_F_TAG = [
+        "Athena",
+        "AnalysisBase",
+        "AtlasOffline",
+        "AthAnalysis",
+        "AthSimulation",
+        "MCProd",
+        "AthGeneration",
+        "AthDerivation",
+    ]
+    KEEP_P_TAG = [
+        "jedi-run",
+        "deriv",
+        "athena-trf",
+        "jedi-athena",
+        "simul",
+        "pile",
+        "merge",
+        "evgen",
+        "reprocessing",
+        "recon",
+        "eventIndex",
+    ]
 
-    df['P'] = df['P'].apply(lambda x: x if x in KEEP_P_TAG else 'others')
-    df['F'] = df['F'].apply(lambda x: x if x in KEEP_F_TAG else 'others')
+    df["P"] = df["P"].apply(lambda x: x if x in KEEP_P_TAG else "others")
+    df["F"] = df["F"].apply(lambda x: x if x in KEEP_F_TAG else "others")
     return df
 
-base_path = "/data/model-data/"
 
+base_path = "/data/model-data/"
+categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
 data = pd.read_parquet("/data/model-data/merged_files/c_task.parquet")
 dataset = pd.read_parquet("/data/model-data/merged_files/c_data.parquet")
 ceff = pd.read_parquet("/data/model-data/merged_files/c_eff.parquet")
-df_ = pd.merge(data, dataset, on='JEDITASKID', how='right')
-df_ = pd.merge(df_, ceff, on='JEDITASKID', how='left')
+df_ = pd.merge(data, dataset, on="JEDITASKID", how="right")
+df_ = pd.merge(df_, ceff, on="JEDITASKID", how="left")
 
 # task_train_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/training_historial.parquet'
 task_train_data_path = (
@@ -90,8 +111,11 @@ new_preprocessor = HistoricalDataProcessor(task_new_data_path)
 # training_data = processor.filtered_data()
 # future_data = new_preprocessor.filtered_data()
 
-training_data = df_.copy()
-
+df_ = preprocess_data(df_)
+training_data = df_.sample(frac=0.9, random_state=42)
+future_data = df_[
+    ~df_.index.isin(training_data.index)
+]  # Get the remaining rows
 
 
 #################################################################################################################
@@ -100,8 +124,6 @@ training_data = df_.copy()
 #################################################################################################################
 
 target_var = ["RAMCOUNT"]
-
-
 
 
 encoder = CategoricalEncoder()
@@ -123,10 +145,8 @@ selected_columns = [
     "RAMCOUNT",
     "CTIME",
     "CPU_EFF",
-    "IOINTENSITY"
+    "IOINTENSITY",
 ]
-
-
 
 
 # Further filter the training data based on specific criteria
@@ -135,7 +155,7 @@ training_data = training_data[
     & (training_data["RAMCOUNT"] > 100)
     & (training_data["RAMCOUNT"] < 10000)
 ]
-
+categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
 print(training_data.shape)
 splitter = DataSplitter(training_data, selected_columns)
 train_df, test_df = splitter.split_data(test_size=0.15)
@@ -147,7 +167,7 @@ numerical_features = [
     "TOTAL_NEVENTS",
     "DISTINCT_DATASETNAME_COUNT",
 ]
-categorical_features = ['PRODSOURCELABEL', 'P', 'F', 'CORE']
+categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
 features = numerical_features + categorical_features
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@------------------
