@@ -12,7 +12,9 @@ class ModelMetrics:
         """
         self.actual_columns = actual_columns
 
-    def calculate_metrics(self, df: pd.DataFrame, predicted_columns: list) -> dict:
+    def calculate_metrics(
+        self, df: pd.DataFrame, predicted_columns: list
+    ) -> dict:
         """
         Calculates error metrics for predicted values compared to actual values.
 
@@ -48,8 +50,11 @@ class ModelMetrics:
                 r2 = r2_score(actual, predicted)
 
                 # Calculate Mean Absolute Percentage Error
-                mape = ( abs(actual - predicted) / actual).mean() * 100 if not actual.empty and actual.mean() != 0 else float(
-                    'inf')  # Handle potential division by zero
+                mape = (
+                    (abs(actual - predicted) / actual).mean() * 100
+                    if not actual.empty and actual.mean() != 0
+                    else float("inf")
+                )  # Handle potential division by zero
 
                 # Accumulate model metrics
                 model_mae += mae
@@ -60,10 +65,10 @@ class ModelMetrics:
             # Average metrics for current model
             num_actuals = len(self.actual_columns)
             results[predicted_column] = {
-                'Mean Absolute Error': model_mae / num_actuals,
-                'Root Mean Squared Error': model_rmse / num_actuals,
-                'R-squared': model_r2 / num_actuals,
-                'Mean Absolute Percentage Error': model_mape / num_actuals,
+                "Mean Absolute Error": model_mae / num_actuals,
+                "Root Mean Squared Error": model_rmse / num_actuals,
+                "R-squared": model_r2 / num_actuals,
+                "Mean Absolute Percentage Error": model_mape / num_actuals,
             }
 
             # Accumulate overall metrics
@@ -74,13 +79,21 @@ class ModelMetrics:
 
         # Calculate overall metrics (averaging)
         overall_metrics = {
-            'Overall Mean Absolute Error': overall_mae / num_models if num_models > 0 else 0,
-            'Overall Root Mean Squared Error': overall_rmse / num_models if num_models > 0 else 0,
-            'Overall Mean Absolute Percentage Error': overall_mape / num_models if num_models > 0 else 0,
-            'Overall R-squared': overall_r2 / num_models if num_models > 0 else 0,
+            "Overall Mean Absolute Error": (
+                overall_mae / num_models if num_models > 0 else 0
+            ),
+            "Overall Root Mean Squared Error": (
+                overall_rmse / num_models if num_models > 0 else 0
+            ),
+            "Overall Mean Absolute Percentage Error": (
+                overall_mape / num_models if num_models > 0 else 0
+            ),
+            "Overall R-squared": (
+                overall_r2 / num_models if num_models > 0 else 0
+            ),
         }
 
         return {
-            'Individual Metrics': results,
-            'Overall Metrics': overall_metrics
+            "Individual Metrics": results,
+            "Overall Metrics": overall_metrics,
         }

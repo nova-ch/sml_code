@@ -1,0 +1,70 @@
+#pre-commit run --all-files
+#autopep8 -i --recursive .
+#autoflake -i --remove-unused-variables
+#pre-commit install
+#pre-commit run --all-files
+#pre-commit autoupdate
+#autopep8 -i --recursive .
+#autoflake -i --remove-unused-variables .repos:
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0  # Use the latest version available
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+        name: black
+        entry: black
+        language: python
+        types: [python]
+        additional_dependencies:
+          - black[jupyter]
+        args: ["--line-length", "79"]
+
+          #- repo: https://github.com/PyCQA/pylint
+          #rev: v3.3.4
+          #hooks:
+          #- id: pylint
+          #name: pylint
+          #entry: pylint
+          #language: python
+          #types: [python]
+          #additional_dependencies:
+          #- pylint
+          #files: \.py$
+          #args:
+          #- --disable=C0114,C0115,C0116,E501  # Disable specific warnings/errors
+          # - --max-line-length=88  # Set max line length to match Black's default
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        name: flake8
+        entry: flake8
+        language: python
+        types: [python]
+        additional_dependencies:
+          - flake8
+        args:
+          - --ignore=E501
+          - --extend-ignore=W503
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.1  # Use the latest version available for autoflake
+    hooks:
+      - id: autoflake
+        name: autoflake
+        entry: autoflake
+        language: python
+        types: [python]
+        additional_dependencies:
+          - autoflake
+        args:
+          - --in-place  # Modify files in place.
+          - --remove-all-unused-imports  # Remove all unused imports.
+          - --remove-unused-variables  # Remove unused variables.
+          - --recursive  # Process directories recursively.

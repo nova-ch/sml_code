@@ -2,7 +2,15 @@
 
 import tensorflow as tf
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Dense, Conv1D, BatchNormalization, MaxPooling1D, Flatten, Dropout
+from tensorflow.keras.layers import (
+    Input,
+    Dense,
+    Conv1D,
+    BatchNormalization,
+    MaxPooling1D,
+    Flatten,
+    Dropout,
+)
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
@@ -13,13 +21,15 @@ import seaborn as sns
 from typing import Union, Callable, Optional, List, Tuple
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
+from scout_ml_package.data import TrainingDataPreprocessor, NewDataPreprocessor
+
 
 class DeviceInfo:
     @staticmethod
     def print_device_info():
         """Print information about available GPUs and CPUs."""
         print("Checking available devices...")
-        gpus = tf.config.list_physical_devices('GPU')
+        gpus = tf.config.list_physical_devices("GPU")
         if gpus:
             print(f"Number of GPUs available: {len(gpus)}")
             for gpu in gpus:
@@ -27,16 +37,21 @@ class DeviceInfo:
         else:
             print("No GPUs found. Using CPU instead.")
 
-        cpus = tf.config.list_physical_devices('CPU')
+        cpus = tf.config.list_physical_devices("CPU")
         print(f"Number of logical CPUs available: {len(cpus)}")
         for cpu in cpus:
             print(f" - CPU: {cpu}")
 
 
 class MultiOutputModel:
-    def __init__(self, input_shape: int, output_shape: int, loss_function: str = 'mse',
-                 regularizer: tf.keras.regularizers.Regularizer = l2(0.01),
-                 optimizer: tf.keras.optimizers.Optimizer = Adam()):
+    def __init__(
+        self,
+        input_shape: int,
+        output_shape: int,
+        loss_function: str = "mse",
+        regularizer: tf.keras.regularizers.Regularizer = l2(0.01),
+        optimizer: tf.keras.optimizers.Optimizer = Adam(),
+    ):
         """
         Initialize the MultiOutputModel.
 
@@ -58,17 +73,30 @@ class MultiOutputModel:
         """Build and compile the model for CPU time prediction."""
         inputs = Input(shape=(self.input_shape,))
         x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
-        x = self._add_conv_block(x, filters=128, kernel_size=7, activation='relu', pool_size=2)
-        x = self._add_conv_block(x, filters=32, kernel_size=3, activation='relu', pool_size=2)
+        x = self._add_conv_block(
+            x, filters=128, kernel_size=7, activation="relu", pool_size=2
+        )
+        x = self._add_conv_block(
+            x, filters=32, kernel_size=3, activation="relu", pool_size=2
+        )
         x = Flatten()(x)
-        x = self._add_dense_block(x, units=512, dropout_rate=0.5, activation='relu')
-        x = self._add_dense_block(x, units=256, dropout_rate=0.4, activation='relu')
-        x = self._add_dense_block(x, units=64, dropout_rate=0.3, activation='sigmoid')
-        outputs = Dense(self.output_shape, activation='relu')(x)
+        x = self._add_dense_block(
+            x, units=512, dropout_rate=0.5, activation="relu"
+        )
+        x = self._add_dense_block(
+            x, units=256, dropout_rate=0.4, activation="relu"
+        )
+        x = self._add_dense_block(
+            x, units=64, dropout_rate=0.3, activation="sigmoid"
+        )
+        outputs = Dense(self.output_shape, activation="relu")(x)
 
         model = Model(inputs, outputs)
-        model.compile(optimizer=self.optimizer, loss=self.loss_function,
-                      metrics=['mean_absolute_error', 'mean_squared_error'])
+        model.compile(
+            optimizer=self.optimizer,
+            loss=self.loss_function,
+            metrics=["mean_absolute_error", "mean_squared_error"],
+        )
         self.model = model
         return model
 
@@ -76,29 +104,53 @@ class MultiOutputModel:
         inputs = Input(shape=(self.input_shape,))
         x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
 
-        x = self._add_conv_block(x, filters=256, kernel_size=3, activation='elu', pool_size=2)
+        x = self._add_conv_block(
+            x, filters=256, kernel_size=3, activation="elu", pool_size=2
+        )
         x = Flatten()(x)
-        #x = self._add_dense_block(x, units=256, dropout_rate=0.4, activation='elu')
+        # x = self._add_dense_block(x, units=256, dropout_rate=0.4, activation='elu')
 
-        outputs = Dense(self.output_shape, activation='relu')(x)
+        outputs = Dense(self.output_shape, activation="relu")(x)
         model = Model(inputs, outputs)
 
-        model.compile(optimizer=self.optimizer, loss=self.loss_function,
-                      metrics=['mean_absolute_error'])
+        model.compile(
+            optimizer=self.optimizer,
+            loss=self.loss_function,
+            metrics=["mean_absolute_error"],
+        )
         self.model = model
         return model
 
-    def _add_conv_block(self, x: tf.Tensor, filters: int, kernel_size: int, activation: str = 'relu',
-                        pool_size: int = 2) -> tf.Tensor:
+    def _add_conv_block(
+        self,
+        x: tf.Tensor,
+        filters: int,
+        kernel_size: int,
+        activation: str = "relu",
+        pool_size: int = 2,
+    ) -> tf.Tensor:
         """Add a convolutional block to the model."""
-        x = Conv1D(filters=filters, kernel_size=kernel_size, activation=activation, padding='same')(x)
+        x = Conv1D(
+            filters=filters,
+            kernel_size=kernel_size,
+            activation=activation,
+            padding="same",
+        )(x)
         x = BatchNormalization()(x)
         x = MaxPooling1D(pool_size=pool_size)(x)
         return x
 
-    def _add_dense_block(self, x: tf.Tensor, units: int, dropout_rate: float, activation: str = 'relu') -> tf.Tensor:
+    def _add_dense_block(
+        self,
+        x: tf.Tensor,
+        units: int,
+        dropout_rate: float,
+        activation: str = "relu",
+    ) -> tf.Tensor:
         """Add a dense block to the model."""
-        x = Dense(units, activation=activation, kernel_regularizer=self.regularizer)(x)
+        x = Dense(
+            units, activation=activation, kernel_regularizer=self.regularizer
+        )(x)
         x = Dropout(dropout_rate)(x)
         x = BatchNormalization()(x)
         return x
@@ -107,10 +159,12 @@ class MultiOutputModel:
     def get_loss_function(loss_function: str) -> Union[str, Callable]:
         """Get the loss function based on the provided string."""
         loss_functions = {
-            'mse': tf.keras.losses.MeanSquaredError(),
-            'mae': tf.keras.losses.MeanAbsoluteError(),
-            'rmse': lambda y_true, y_pred: tf.sqrt(tf.reduce_mean(tf.square(y_true - y_pred))),
-            'huber': tf.keras.losses.Huber(delta=7.0),
+            "mse": tf.keras.losses.MeanSquaredError(),
+            "mae": tf.keras.losses.MeanAbsoluteError(),
+            "rmse": lambda y_true, y_pred: tf.sqrt(
+                tf.reduce_mean(tf.square(y_true - y_pred))
+            ),
+            "huber": tf.keras.losses.Huber(delta=7.0),
         }
         if loss_function not in loss_functions:
             raise ValueError(f"Unknown loss function: {loss_function}")
@@ -118,8 +172,16 @@ class MultiOutputModel:
 
 
 class ModelTrainer:
-    def __init__(self, model_class: type, input_shape: int, loss_function: str = 'mse',
-                 metrics: Optional[List[Union[str, Callable]]] = None, build_function: str = 'build', *args, **kwargs):
+    def __init__(
+        self,
+        model_class: type,
+        input_shape: int,
+        loss_function: str = "mse",
+        metrics: Optional[List[Union[str, Callable]]] = None,
+        build_function: str = "build",
+        *args,
+        **kwargs,
+    ):
         """
         Initialize the ModelTrainer.
 
@@ -132,16 +194,25 @@ class ModelTrainer:
             *args: Additional positional arguments for the model class.
             **kwargs: Additional keyword arguments for the model class.
         """
-        self.model_instance = model_class(input_shape, loss_function=loss_function, *args, **kwargs)
+        self.model_instance = model_class(
+            input_shape, loss_function=loss_function, *args, **kwargs
+        )
         self.loss_function = loss_function
         self.metrics = metrics or []
         self.history = None
         self.build_function = build_function
         DeviceInfo.print_device_info()
 
-    def train(self, X_train: tf.Tensor, y_train: tf.Tensor, X_val: tf.Tensor, y_val: tf.Tensor,
-              epochs: int = 50, batch_size: int = 32, build_function_name: str = None) -> Tuple[
-        Model, tf.keras.callbacks.History]:
+    def train(
+        self,
+        X_train: tf.Tensor,
+        y_train: tf.Tensor,
+        X_val: tf.Tensor,
+        y_val: tf.Tensor,
+        epochs: int = 50,
+        batch_size: int = 32,
+        build_function_name: str = None,
+    ) -> Tuple[Model, tf.keras.callbacks.History]:
         """
         Train the model.
 
@@ -158,23 +229,35 @@ class ModelTrainer:
             Tuple[Model, tf.keras.callbacks.History]: The trained model and training history.
         """
         build_function_name = build_function_name or self.build_function
-        strategy = tf.distribute.MirroredStrategy() if tf.config.list_physical_devices(
-            'GPU') else tf.distribute.get_strategy()
+        strategy = (
+            tf.distribute.MirroredStrategy()
+            if tf.config.list_physical_devices("GPU")
+            else tf.distribute.get_strategy()
+        )
 
         with strategy.scope():
             model = getattr(self.model_instance, build_function_name)()
-            model.compile(optimizer=self.model_instance.optimizer, loss=self.loss_function, metrics=self.metrics)
+            model.compile(
+                optimizer=self.model_instance.optimizer,
+                loss=self.loss_function,
+                metrics=self.metrics,
+            )
 
-        early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
-        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=1e-6)
+        early_stopping = EarlyStopping(
+            monitor="val_loss", patience=10, restore_best_weights=True
+        )
+        reduce_lr = ReduceLROnPlateau(
+            monitor="val_loss", factor=0.2, patience=5, min_lr=1e-6
+        )
 
         self.history = model.fit(
-            X_train, y_train,
+            X_train,
+            y_train,
             validation_data=(X_val, y_val),
             epochs=epochs,
             batch_size=batch_size,
             callbacks=[early_stopping, reduce_lr],
-            verbose=1
+            verbose=1,
         )
 
         return model, self.history
@@ -196,7 +279,9 @@ class TrainedModel:
         """Make predictions using the trained model."""
         return self.model.predict(X)
 
-    def evaluate(self, X_test: pd.DataFrame, y_test: pd.DataFrame) -> pd.DataFrame:
+    def evaluate(
+        self, X_test: pd.DataFrame, y_test: pd.DataFrame
+    ) -> pd.DataFrame:
         """
         Evaluate the model's performance.
 
@@ -215,26 +300,32 @@ class TrainedModel:
             rmse = np.sqrt(mse)
             mae = mean_absolute_error(y_test.iloc[:, i], y_pred[:, i])
             r2 = r2_score(y_test.iloc[:, i], y_pred[:, i])
-            metrics[f'Target {i + 1} (MSE)'] = mse
-            metrics[f'Target {i + 1} (RMSE)'] = rmse
-            metrics[f'Target {i + 1} (MAE)'] = mae
-            metrics[f'Target {i + 1} (R²)'] = r2
+            metrics[f"Target {i + 1} (MSE)"] = mse
+            metrics[f"Target {i + 1} (RMSE)"] = rmse
+            metrics[f"Target {i + 1} (MAE)"] = mae
+            metrics[f"Target {i + 1} (R²)"] = r2
 
-        overall_mse = mean_squared_error(y_test, y_pred, multioutput='uniform_average')
+        overall_mse = mean_squared_error(
+            y_test, y_pred, multioutput="uniform_average"
+        )
         overall_rmse = np.sqrt(overall_mse)
-        overall_mae = mean_absolute_error(y_test, y_pred, multioutput='uniform_average')
-        overall_r2 = r2_score(y_test, y_pred, multioutput='uniform_average')
-        metrics['Overall (MSE)'] = overall_mse
-        metrics['Overall (RMSE)'] = overall_rmse
-        metrics['Overall (MAE)'] = overall_mae
-        metrics['Overall (R²)'] = overall_r2
+        overall_mae = mean_absolute_error(
+            y_test, y_pred, multioutput="uniform_average"
+        )
+        overall_r2 = r2_score(y_test, y_pred, multioutput="uniform_average")
+        metrics["Overall (MSE)"] = overall_mse
+        metrics["Overall (RMSE)"] = overall_rmse
+        metrics["Overall (MAE)"] = overall_mae
+        metrics["Overall (R²)"] = overall_r2
 
-        return pd.DataFrame(metrics.items(), columns=['Metric', 'Value'])
+        return pd.DataFrame(metrics.items(), columns=["Metric", "Value"])
 
     def save(self, save_path: str):
         """Save the trained model."""
         self.model.save(f"{save_path}/{self.model_name}.keras")
-        print(f"Model '{self.model_name}' saved at {save_path}/{self.model_name}.keras")
+        print(
+            f"Model '{self.model_name}' saved at {save_path}/{self.model_name}.keras"
+        )
 
 
 class PredictionVisualizer:
@@ -247,7 +338,12 @@ class PredictionVisualizer:
         """
         self.trained_model = trained_model
 
-    def plot_predictions(self, X_test: pd.DataFrame, y_test: pd.DataFrame, num_samples: int = 100):
+    def plot_predictions(
+        self,
+        X_test: pd.DataFrame,
+        y_test: pd.DataFrame,
+        num_samples: int = 100,
+    ):
         """
         Plot predictions against actual values.
 
@@ -265,18 +361,27 @@ class PredictionVisualizer:
             ax2 = axes[i, 1]
 
             # Scatter plot
-            sns.scatterplot(x=y_test.iloc[:num_samples, i], y=y_pred[:num_samples, i], ax=ax1)
-            ax1.set_xlabel('Actual')
-            ax1.set_ylabel('Predicted')
-            ax1.set_title(f'Target {i + 1} - Scatter Plot')
+            sns.scatterplot(
+                x=y_test.iloc[:num_samples, i],
+                y=y_pred[:num_samples, i],
+                ax=ax1,
+            )
+            ax1.set_xlabel("Actual")
+            ax1.set_ylabel("Predicted")
+            ax1.set_title(f"Target {i + 1} - Scatter Plot")
 
             # Histogram plot
             actual_values = y_test.iloc[:num_samples, i]
             predicted_values = y_pred[:num_samples, i]
-            ax2.hist([actual_values, predicted_values], bins=20, label=['Actual', 'Predicted'], density=True)
-            ax2.set_xlabel('Value')
-            ax2.set_ylabel('Density')
-            ax2.set_title(f'Target {i + 1} - Histogram')
+            ax2.hist(
+                [actual_values, predicted_values],
+                bins=20,
+                label=["Actual", "Predicted"],
+                density=True,
+            )
+            ax2.set_xlabel("Value")
+            ax2.set_ylabel("Density")
+            ax2.set_title(f"Target {i + 1} - Histogram")
             ax2.legend()
 
         plt.tight_layout()
@@ -284,7 +389,12 @@ class PredictionVisualizer:
 
 
 class ModelPipeline:
-    def __init__(self, training_data: pd.DataFrame, selected_columns: List[str], test_size: float = 0.15):
+    def __init__(
+        self,
+        training_data: pd.DataFrame,
+        selected_columns: List[str],
+        test_size: float = 0.15,
+    ):
         """
         Initialize the ModelPipeline.
 
@@ -304,10 +414,19 @@ class ModelPipeline:
     def split_data(self):
         """Split the data into training and testing sets."""
         from scout_ml_package.data.data_manager import DataSplitter
-        splitter = DataSplitter(self.training_data, self.selected_columns)
-        self.train_df, self.test_df = splitter.split_data(test_size=self.test_size)
 
-    def preprocess_data(self, model_target, numerical_features, categorical_features, category_list):
+        splitter = DataSplitter(self.training_data, self.selected_columns)
+        self.train_df, self.test_df = splitter.split_data(
+            test_size=self.test_size
+        )
+
+    def preprocess_data(
+        self,
+        model_target,
+        numerical_features,
+        categorical_features,
+        category_list,
+    ):
         self.model_target = model_target
         self.numerical_features = numerical_features
         self.categorical_features = categorical_features
@@ -315,23 +434,37 @@ class ModelPipeline:
         self.category_list = category_list
 
         training_preprocessor = TrainingDataPreprocessor()
-        self.processed_train_data, self.encoded_columns, self.fitted_scaler = training_preprocessor.preprocess(
-            self.train_df, self.numerical_features, self.categorical_features, self.category_list
+        self.processed_train_data, self.encoded_columns, self.fitted_scaler = (
+            training_preprocessor.preprocess(
+                self.train_df,
+                self.numerical_features,
+                self.categorical_features,
+                self.category_list,
+            )
         )
 
         # After processing data, print the shape of X_train
-        X_train = self.processed_train_data[self.encoded_columns + self.numerical_features]
+        X_train = self.processed_train_data[
+            self.encoded_columns + self.numerical_features
+        ]
         self.print_X_train_shape(X_train)
 
     def preprocess_new_data(self, test_df, future_data):
         new_data_preprocessor = NewDataPreprocessor()
         self.processed_test_data = new_data_preprocessor.preprocess(
-            test_df, self.numerical_features, self.categorical_features, self.category_list,
-            self.fitted_scaler, self.encoded_columns + self.model_target + ['JEDITASKID']
+            test_df,
+            self.numerical_features,
+            self.categorical_features,
+            self.category_list,
+            self.fitted_scaler,
+            self.encoded_columns + self.model_target + ["JEDITASKID"],
         )
 
         self.processed_future_data = new_data_preprocessor.preprocess(
-            future_data, self.numerical_features, self.categorical_features, self.category_list,
-            self.fitted_scaler, self.encoded_columns + self.model_target + ['JEDITASKID']
+            future_data,
+            self.numerical_features,
+            self.categorical_features,
+            self.category_list,
+            self.fitted_scaler,
+            self.encoded_columns + self.model_target + ["JEDITASKID"],
         )
-

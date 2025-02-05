@@ -1,14 +1,29 @@
 import os
 import pandas as pd
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, root_mean_squared_error
+from sklearn.metrics import (
+    mean_absolute_error,
+    r2_score,
+    root_mean_squared_error,
+)
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    classification_report,
+)
 
-import numpy as np
+
 class ErrorMetricsPlotter:
-    def __init__(self, df: pd.DataFrame, actual_column: str = 'RAMCOUNT', predicted_column: str = 'Predicted_RAMCOUNT',
-                 plot_directory: str = 'plots'):
+    def __init__(
+        self,
+        df: pd.DataFrame,
+        actual_column: str = "RAMCOUNT",
+        predicted_column: str = "Predicted_RAMCOUNT",
+        plot_directory: str = "plots",
+    ):
         self.df = df
         self.actual_column = actual_column
         self.predicted_column = predicted_column
@@ -25,14 +40,18 @@ class ErrorMetricsPlotter:
         r2 = r2_score(self.actual, self.predicted)
 
         # Calculate Mean Absolute Percentage Error (MAPE)
-        mape = (abs((self.actual - self.predicted) / self.actual)
-                .replace([float('inf'), -float('inf')], 0)
-                .fillna(0)).mean() * 100
+        mape = (
+            abs((self.actual - self.predicted) / self.actual)
+            .replace([float("inf"), -float("inf")], 0)
+            .fillna(0)
+        ).mean() * 100
         return mae, rmse, r2, mape
 
     def print_metrics(self):
         mae, rmse, r2, mape = self.calculate_metrics()
-        print(f"Metrics for {self.predicted_column} compared to {self.actual_column}:")
+        print(
+            f"Metrics for {self.predicted_column} compared to {self.actual_column}:"
+        )
         print(f"Mean Absolute Error (MAE): {mae}")
         print(f"Root Mean Squared Error (RMSE): {rmse}")
         print(f"R-squared (R²): {r2}")
@@ -46,36 +65,65 @@ class ErrorMetricsPlotter:
         # Plot Actual vs Predicted
         plt.subplot(1, 3, 1)
         plt.scatter(self.actual, self.predicted, alpha=0.7)
-        plt.plot([self.actual.min(), self.actual.max()], [self.actual.min(), self.actual.max()], 'r--')
-        plt.xlabel('Actual Values')
-        plt.ylabel('Predicted Values')
-        plt.title('Actual vs Predicted')
+        plt.plot(
+            [self.actual.min(), self.actual.max()],
+            [self.actual.min(), self.actual.max()],
+            "r--",
+        )
+        plt.xlabel("Actual Values")
+        plt.ylabel("Predicted Values")
+        plt.title("Actual vs Predicted")
 
-        metrics_text = (f'MAE: {mae:.2f}\n'
-                        f'RMSE: {rmse:.2f}\n'
-                        f'R²: {r2:.2f}\n'
-                        f'MAPE: {mape:.2f}%')
-        plt.text(0.05, 0.95, metrics_text, transform=plt.gca().transAxes,
-                 fontsize=12, verticalalignment='top', backgroundcolor='white')
+        metrics_text = (
+            f"MAE: {mae:.2f}\n"
+            f"RMSE: {rmse:.2f}\n"
+            f"R²: {r2:.2f}\n"
+            f"MAPE: {mape:.2f}%"
+        )
+        plt.text(
+            0.05,
+            0.95,
+            metrics_text,
+            transform=plt.gca().transAxes,
+            fontsize=12,
+            verticalalignment="top",
+            backgroundcolor="white",
+        )
 
         # Plot Histogram of Errors
         errors = self.actual - self.predicted
         plt.subplot(1, 3, 2)
-        plt.hist(errors, bins=20, color='gray', edgecolor='black', alpha=0.7)
-        plt.xlabel('Prediction Error')
-        plt.ylabel('Frequency')
-        plt.title('Histogram of Prediction Errors')
+        plt.hist(errors, bins=20, color="gray", edgecolor="black", alpha=0.7)
+        plt.xlabel("Prediction Error")
+        plt.ylabel("Frequency")
+        plt.title("Histogram of Prediction Errors")
 
         # Plot Distributions of Actual vs Predicted
         plt.subplot(1, 3, 3)
-        plt.hist(self.actual, bins=20, alpha=0.5, label='Actual', color='blue', edgecolor='black')
-        plt.hist(self.predicted, bins=20, alpha=0.5, label='Predicted', color='orange', edgecolor='black')
-        plt.xlabel('Value')
-        plt.ylabel('Frequency')
-        plt.title('Distribution of Actual and Predicted Values')
-        plt.legend(loc='upper right')
+        plt.hist(
+            self.actual,
+            bins=20,
+            alpha=0.5,
+            label="Actual",
+            color="blue",
+            edgecolor="black",
+        )
+        plt.hist(
+            self.predicted,
+            bins=20,
+            alpha=0.5,
+            label="Predicted",
+            color="orange",
+            edgecolor="black",
+        )
+        plt.xlabel("Value")
+        plt.ylabel("Frequency")
+        plt.title("Distribution of Actual and Predicted Values")
+        plt.legend(loc="upper right")
 
-        plot_path = os.path.join(self.plot_directory, f'plot_{self.predicted_column}.png')
+        plot_path = os.path.join(
+            self.plot_directory, f"plot_{self.predicted_column}.png"
+        )
         plt.tight_layout()
         plt.savefig(plot_path)
         print(f"Plot saved to {plot_path}")
@@ -83,8 +131,15 @@ class ErrorMetricsPlotter:
         # Optionally display the plot
         # plt.show()
 
+
 class ClassificationMetricsPlotter:
-    def __init__(self, df: pd.DataFrame, actual_column: str, predicted_column: str, plot_directory: str = 'plots'):
+    def __init__(
+        self,
+        df: pd.DataFrame,
+        actual_column: str,
+        predicted_column: str,
+        plot_directory: str = "plots",
+    ):
         self.df = df
         self.actual_column = actual_column
         self.predicted_column = predicted_column
@@ -104,7 +159,10 @@ class ClassificationMetricsPlotter:
         disp.plot(cmap=plt.cm.Blues)
 
         # Save the confusion matrix plot
-        plot_path = os.path.join(self.plot_directory, f'confusion_matrix_{self.predicted_column}.png')
+        plot_path = os.path.join(
+            self.plot_directory,
+            f"confusion_matrix_{self.predicted_column}.png",
+        )
         plt.title("Confusion Matrix")
         plt.savefig(plot_path)
         plt.close()
@@ -115,29 +173,38 @@ class ClassificationMetricsPlotter:
     #     # This method can be expanded to include other classification visualizations
     #     pass
 
-
     def calculate_and_print_metrics(self):
         # Calculate evaluation metrics for classification
         accuracy = accuracy_score(self.actual, self.predicted)
-        precision = precision_score(self.actual, self.predicted, average='weighted')  # Use 'binary' for binary tasks
-        recall = recall_score(self.actual, self.predicted, average='weighted')  # Use 'binary' for binary tasks
-        f1 = f1_score(self.actual, self.predicted, average='weighted')  # Use 'binary' for binary tasks
+        precision = precision_score(
+            self.actual, self.predicted, average="weighted"
+        )  # Use 'binary' for binary tasks
+        recall = recall_score(
+            self.actual, self.predicted, average="weighted"
+        )  # Use 'binary' for binary tasks
+        f1 = f1_score(
+            self.actual, self.predicted, average="weighted"
+        )  # Use 'binary' for binary tasks
 
         # Print the evaluation metrics
-        print(f"Metrics for {self.predicted_column} compared to {self.actual_column}:")
+        print(
+            f"Metrics for {self.predicted_column} compared to {self.actual_column}:"
+        )
         print(f"Accuracy: {accuracy:.2f}")
         print(f"Precision: {precision:.2f}")
         print(f"Recall: {recall:.2f}")
         print(f"F1 Score: {f1:.2f}")
 
         # Optional: Print classification report for detailed metrics per class
-        report = classification_report(self.actual, self.predicted,
-                                       target_names=['Class 0', 'Class 1'])  # Modify target_names as needed
+        report = classification_report(
+            self.actual, self.predicted, target_names=["Class 0", "Class 1"]
+        )  # Modify target_names as needed
         print("Classification Report:\n", report)
 
         # Additional metrics like confusion matrix can also be printed if needed:
         cm = confusion_matrix(self.actual, self.predicted)
         print("Confusion Matrix:\n", cm)
+
 
 # Example usage:
 # df = pd.DataFrame(...)  # your DataFrame with actual and predicted columns

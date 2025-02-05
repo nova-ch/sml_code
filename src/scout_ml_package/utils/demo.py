@@ -26,24 +26,31 @@ class DataValidator:
         min_val, max_val = acceptable_ranges[column]
         if df[column].min() < min_val or df[column].max() > max_val:
             raise ValueError(
-                f"Predictions for {column} are outside the acceptable range of {acceptable_ranges[column]}")
+                f"Predictions for {column} are outside the acceptable range of {acceptable_ranges[column]}"
+            )
+
 
 class DummyData:
     @classmethod
     def fetch_data(cls):
         # Simulate data retrieval
         data = {
-            'JEDITASKID': [27766704, 27746332],
-            'PRODSOURCELABEL': ['managed', 'user'],
-            'PROCESSINGTYPE': ['deriv', 'panda-client-1.4.98-jedi-run'],
-            'TRANSHOME': ['AthDerivation-21.2.77.0', 'AnalysisTransforms-AnalysisBase_21.2.197'],
-            'CPUTIMEUNIT': ['HS06sPerEvent', 'mHS06sPerEvent'],
-            'CORECOUNT': [8, 1],
-            'TOTAL_NFILES': [290000, 11237955],
-            'TOTAL_NEVENTS': [23, 260],
-            'DISTINCT_DATASETNAME_COUNT': [1, 3]
+            "JEDITASKID": [27766704, 27746332],
+            "PRODSOURCELABEL": ["managed", "user"],
+            "PROCESSINGTYPE": ["deriv", "panda-client-1.4.98-jedi-run"],
+            "TRANSHOME": [
+                "AthDerivation-21.2.77.0",
+                "AnalysisTransforms-AnalysisBase_21.2.197",
+            ],
+            "CPUTIMEUNIT": ["HS06sPerEvent", "mHS06sPerEvent"],
+            "CORECOUNT": [8, 1],
+            "TOTAL_NFILES": [290000, 11237955],
+            "TOTAL_NEVENTS": [23, 260],
+            "DISTINCT_DATASETNAME_COUNT": [1, 3],
         }
         return pd.DataFrame(data)
+
+
 #
 # # Example usage
 # if __name__ == "__main__":

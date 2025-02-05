@@ -1,6 +1,13 @@
-from .data_manager import (HistoricalDataProcessor, DataSplitter, ModelTrainingInput, CategoricalEncoder,
-                           BaseDataPreprocessor, TrainingDataPreprocessor, NewDataPreprocessor,
-                           LiveDataPreprocessor)
+from .data_manager import (
+    HistoricalDataProcessor,
+    DataSplitter,
+    ModelTrainingInput,
+    CategoricalEncoder,
+    BaseDataPreprocessor,
+    TrainingDataPreprocessor,
+    NewDataPreprocessor,
+    LiveDataPreprocessor,
+)
 from .fetch_db_data import DatabaseFetcher
 
 __all__ = [
@@ -12,6 +19,5 @@ __all__ = [
     "TrainingDataPreprocessor",
     "NewDataPreprocessor",
     "LiveDataPreprocessor",
-    "DatabaseFetcher"
-
+    "DatabaseFetcher",
 ]
