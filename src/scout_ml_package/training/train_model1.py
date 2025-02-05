@@ -153,7 +153,7 @@ selected_columns = [
 training_data = training_data[
     (training_data["PRODSOURCELABEL"].isin(["user", "managed"]))
     & (training_data["RAMCOUNT"] > 100)
-    & (training_data["RAMCOUNT"] < 10000)
+    & (training_data["RAMCOUNT"] < 8000)
 ]
 categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
 print(training_data.shape)
@@ -197,8 +197,8 @@ tuned_model = pipeline.train_model(
     processed_test_data,
     features_to_train,
     "build_ramcount",
-    epoch=1,
-    batch=128,
+    epoch=200,
+    batch=200,
 )  # build_cputime
 predictions, y_pred = pipeline.regression_prediction(
     tuned_model, processed_future_data, features_to_train
@@ -215,11 +215,8 @@ model_name = f"model{model_seq}_{target_name}"  # Define the model name
 plot_directory_name = f"/data/model-data/ModelStorage/plots/model{model_seq}"
 
 joblib.dump(fitted_scalar, f"{model_storage_path}/scaler.pkl")
-model_full_path = model_storage_path + model_name
-# Save the model using ModelHandler
-# pipeline.ModelHandler.save_model(tuned_model, model_storage_path, model_name, format='keras')
 
-# tuned_model.export('ModelStorage/model2/model2_cputime_low')
+model_full_path = model_storage_path + model_name
 tuned_model.export(model_full_path)
 
 # Specifying custom column names when instantiating the class
@@ -240,8 +237,6 @@ plotter = ErrorMetricsPlotter(
 plotter.print_metrics()
 # Plot the metrics
 plotter.plot_metrics()
-
-# print_error_metrics(predictions, actual_column='cputime_HS', predicted_column='Predicted_cputime_HS', plot_directory=model_storage_path)
 
 
 print(model_full_path)
