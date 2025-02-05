@@ -120,7 +120,7 @@ class MultiOutputModel:
         )
         self.model = model
         return model
-        def build_ramcount(self) -> Model:
+    def build_ramcount(self) -> Model:
         inputs = Input(shape=(self.input_shape,))
         x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
         x = self._add_conv_block(
