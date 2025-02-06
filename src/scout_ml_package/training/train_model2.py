@@ -115,12 +115,20 @@ df_ = pd.merge(df_, ceff, on="JEDITASKID", how="left")
 # future_data = new_preprocessor.filtered_data()
 
 df_ = preprocess_data(df_)
-df_ = df_[df_["CPUTIMEUNIT"] == "mHS06sPerEvent"].copy()
-training_data = df_.sample(frac=0.7, random_state=42)
+df_ = df_[
+    (df_["PRODSOURCELABEL"].isin(["user", "managed"]))
+    & (df_["CTIME"] > .3)
+    & (df_["CTIME"] < 9)
+    & (df_["RAMCOUNT"] < 8000)
+    & (df_["RAMCOUNT"] > 10)
+    & (df_["CPUTIMEUNIT"] == "mHS06sPerEvent")
+]
+
+training_data = df_.sample(frac=0.9, random_state=42)
 future_data = df_[
     ~df_.index.isin(training_data.index)
 ]  # Get the remaining rows
-
+future_data = future_data[future_data["CPUTIMEUNIT"] == "mHS06sPerEvent"].copy()
 
 #################################################################################################################
 #################################################################################################################
@@ -156,17 +164,6 @@ selected_columns = [
     "IOINTENSITY",
 ]
 
-
-# Further filter the training data based on specific criteria
-training_data = training_data[
-    (training_data["PRODSOURCELABEL"].isin(["user", "managed"]))
-    & (training_data["CTIME"] > .4)
-    & (training_data["CTIME"] < 9)
-    & (training_data["RAMCOUNT"] < 8000)
-    & (training_data["RAMCOUNT"] > 10)
-    #& (training_data["CPUTIMEUNIT"] == "mHS06sPerEvent")
-]
-categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
 print(training_data.shape)
 splitter = DataSplitter(training_data, selected_columns)
 train_df, test_df = splitter.split_data(test_size=0.15)
@@ -230,6 +227,10 @@ joblib.dump(fitted_scalar, f"{model_storage_path}/scaler.pkl")
 
 model_full_path = model_storage_path + model_name
 tuned_model.export(model_full_path)
+
+predictions = predictions.dropna()
+print(predictions[predicted_column_name].max())
+print(predictions[predicted_column_name].value_counts())
 
 # Specifying custom column names when instantiating the class
 actual_column_name = "CTIME"  # Change this to match your actual column name
