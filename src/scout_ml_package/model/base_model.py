@@ -123,7 +123,41 @@ class MultiOutputModel:
         model = Model(inputs, outputs)
         model.compile(
             optimizer=self.optimizer,
-            loss= tf.keras.optimizers.Adam(learning_rate=0.01), #self.loss_function,
+            loss= self.loss_function,
+            metrics=["RootMeanSquaredError", "mean_squared_error"],
+        )
+        self.model = model
+        return model
+    def weighted_mae(self, y_true, y_pred):
+        mae = tf.abs(y_true - y_pred)
+        # Progressive weighting for different ranges
+        weights = tf.where(y_true > 3000, 4.0,
+                      tf.where(y_true > 2000, 2.5,
+                              tf.where(y_true > 1000, 2.0, 1.0)))
+        return tf.reduce_mean(weights * mae)
+    def build_cputime_high(self) -> Model:
+        """Build and compile the model for CPU time prediction."""
+        inputs = Input(shape=(self.input_shape,))
+        x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
+        x = self._add_conv_block(
+            x, filters=512, kernel_size=3, activation="relu", pool_size=2
+        )
+        x = Flatten()(x)
+        x = self._add_dense_block(
+            x, units=512, dropout_rate=0.4, activation="swish"
+        )
+        x = self._add_dense_block(
+            x, units=256, dropout_rate=0.3, activation="relu"
+        )
+        x = self._add_dense_block(
+            x, units=128, dropout_rate=0.3, activation="relu"
+        )
+        outputs = Dense(self.output_shape, activation='linear')(x)
+        outputs = tf.keras.layers.Lambda(self.custom_activation)(outputs)
+        model = Model(inputs, outputs)
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), #self.optimizer,
+            loss= self.weighted_mae, #self.loss_function,
             metrics=["RootMeanSquaredError", "mean_squared_error"],
         )
         self.model = model
