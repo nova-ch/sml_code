@@ -100,6 +100,35 @@ class MultiOutputModel:
         self.model = model
         return model
 
+    
+    def custom_activation(x):
+        return tf.clip_by_value(x, 0.4, 8.5)
+        
+    def build_cputime_low(self) -> Model:
+        """Build and compile the model for CPU time prediction."""
+        inputs = Input(shape=(self.input_shape,))
+        x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
+        x = self._add_conv_block(
+            x, filters=128, kernel_size=3, activation="relu", pool_size=2
+        )
+        x = Flatten()(x)
+        x = self._add_dense_block(
+            x, units=128, dropout_rate=0.4, activation="relu"
+        )
+        x = self._add_dense_block(
+            x, units=64, dropout_rate=0.3, activation="sigmoid"
+        )
+        outputs = Dense(self.output_shape)(x)
+        outputs = tf.keras.layers.Lambda(custom_activation)(outputs)
+        model = Model(inputs, outputs)
+        model.compile(
+            optimizer=self.optimizer,
+            loss=self.loss_function,
+            metrics=["mean_absolute_error", "mean_squared_error"],
+        )
+        self.model = model
+        return model
+
     def test_build(self) -> Model:
         inputs = Input(shape=(self.input_shape,))
         x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
