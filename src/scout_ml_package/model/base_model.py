@@ -153,7 +153,7 @@ class MultiOutputModel:
             x, units=128, dropout_rate=0.3, activation="relu"
         )
         outputs = Dense(self.output_shape, activation='linear')(x)
-        outputs = tf.keras.layers.Lambda(self.custom_activation)(outputs)
+        #outputs = tf.keras.layers.Lambda(self.custom_activation)(outputs)
         model = Model(inputs, outputs)
         model.compile(
             optimizer=self.optimizer,#tf.keras.optimizers.Adam(learning_rate=0.001), #
