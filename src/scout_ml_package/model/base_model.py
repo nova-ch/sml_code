@@ -302,9 +302,8 @@ class ModelTrainer:
             monitor="val_loss", patience=10, restore_best_weights=True
         )
         reduce_lr = ReduceLROnPlateau(
-            monitor="val_loss", factor=0.2, patience=5, min_lr=1e-6
+            monitor="val_loss", factor=0.4, patience=5, min_lr=1e-6
         )
-
         self.history = model.fit(
             X_train,
             y_train,
