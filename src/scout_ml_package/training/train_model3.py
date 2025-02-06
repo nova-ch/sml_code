@@ -213,7 +213,7 @@ tuned_model = pipeline.train_model(
     features_to_train,
     "build_cputime_high",
     epoch=1,
-    batch=200,
+    batch=128,
 )  # build_cputime
 predictions, y_pred = pipeline.regression_prediction(
     tuned_model, processed_future_data, features_to_train
