@@ -101,22 +101,22 @@ ceff = pd.read_parquet("/data/model-data/merged_files/c_eff.parquet")
 df_ = pd.merge(data, dataset, on="JEDITASKID", how="right")
 df_ = pd.merge(df_, ceff, on="JEDITASKID", how="left")
 
-# task_train_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/training_historial.parquet'
-task_train_data_path = (
-    "/data/model-data/merged_files/training_historial.parquet"
-)
-processor = HistoricalDataProcessor(task_train_data_path)
+# # task_train_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/training_historial.parquet'
+# task_train_data_path = (
+#     "/data/model-data/merged_files/training_historial.parquet"
+# )
+# processor = HistoricalDataProcessor(task_train_data_path)
 
-# task_new_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/new_historial.parquet'
-task_new_data_path = "/data/model-data/merged_files/new_historial.parquet"
-new_preprocessor = HistoricalDataProcessor(task_new_data_path)
+# # task_new_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/new_historial.parquet'
+# task_new_data_path = "/data/model-data/merged_files/new_historial.parquet"
+# new_preprocessor = HistoricalDataProcessor(task_new_data_path)
 # Filter the data
 # training_data = processor.filtered_data()
 # future_data = new_preprocessor.filtered_data()
 
 df_ = preprocess_data(df_)
 df_ = df_[df_["CPUTIMEUNIT"] == "mHS06sPerEvent"].copy()
-training_data = df_.sample(frac=0.9, random_state=42)
+training_data = df_.sample(frac=0.7, random_state=42)
 future_data = df_[
     ~df_.index.isin(training_data.index)
 ]  # Get the remaining rows
@@ -126,7 +126,9 @@ future_data = df_[
 #################################################################################################################
 # Prepare train test dataset for all the models in sequence RAMCOUNT-> cputime_HS -> CPU_EFF -> IOINTENSITY
 #################################################################################################################
-
+print(df_.shape)
+print(training_data.shape)
+print(future_data.shape)
 
     
 
@@ -159,8 +161,8 @@ selected_columns = [
 training_data = training_data[
     (training_data["PRODSOURCELABEL"].isin(["user", "managed"]))
     & (training_data["CTIME"] > .4)
-    & (training_data["CTIME"] < 10)
-    & (training_data["CPUTIMEUNIT"] == "mHS06sPerEvent")
+    & (training_data["CTIME"] < 9)
+    #& (training_data["CPUTIMEUNIT"] == "mHS06sPerEvent")
 ]
 categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
 print(training_data.shape)
