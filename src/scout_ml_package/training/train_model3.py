@@ -242,7 +242,7 @@ predicted_column_name = (
     "Predicted_CTIME"  # Change this to match your predicted column name
 )
 predictions = predictions.dropna()
-print(predictions[predicted_column_name].max()]
+print(predictions[predicted_column_name].max())
 print(predictions[predicted_column_name].value_counts())
 # Create an instance of the ErrorMetricsPlotter class
 plotter = ErrorMetricsPlotter(
