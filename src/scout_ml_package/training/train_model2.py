@@ -213,26 +213,24 @@ predictions, y_pred = pipeline.regression_prediction(
 
 model_seq = "2"
 target_name = "cputime_low"
-# Define the storage path
-model_storage_path = f"ModelStorage/model{model_seq}/"
+
+model_storage_path = (
+    # Define the storage path
+    f"/data/model-data/ModelStorage/model{model_seq}/"
+)
 model_name = f"model{model_seq}_{target_name}"  # Define the model name
 # 'my_plots'  # Optional: specify a custom plots directory
-plot_directory_name = f"ModelStorage/plots/model{model_seq}"
+plot_directory_name = f"/data/model-data/ModelStorage/plots/model{model_seq}"
 
 joblib.dump(fitted_scalar, f"{model_storage_path}/scaler.pkl")
-model_full_path = model_storage_path + model_name
-# Save the model using ModelHandler
-# pipeline.ModelHandler.save_model(tuned_model, model_storage_path, model_name, format='keras')
 
-# tuned_model.export('ModelStorage/model2/model2_cputime_low')
+model_full_path = model_storage_path + model_name
 tuned_model.export(model_full_path)
 
 # Specifying custom column names when instantiating the class
-actual_column_name = (
-    "cputime_HS"  # Change this to match your actual column name
-)
+actual_column_name = "CTIME"  # Change this to match your actual column name
 predicted_column_name = (
-    "Predicted_cputime_HS"  # Change this to match your predicted column name
+    "Predicted_CTIME"  # Change this to match your predicted column name
 )
 
 # Create an instance of the ErrorMetricsPlotter class
@@ -248,9 +246,8 @@ plotter.print_metrics()
 # Plot the metrics
 plotter.plot_metrics()
 
-# print_error_metrics(predictions, actual_column='cputime_HS', predicted_column='Predicted_cputime_HS', plot_directory=model_storage_path)
 
-
+print(model_full_path)
 model = TFSMLayer(model_full_path, call_endpoint="serving_default")
 predictions = model(processed_future_data[features_to_train])
 print(predictions)
