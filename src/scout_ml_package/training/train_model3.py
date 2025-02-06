@@ -189,7 +189,7 @@ numerical_features = [
     "RAMCOUNT"
 ]
 features = numerical_features + categorical_features
-
+print(features)
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@------------------
 print("Pipeline Test")
 
