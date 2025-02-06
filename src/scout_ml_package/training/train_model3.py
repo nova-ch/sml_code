@@ -115,12 +115,12 @@ df_ = pd.merge(df_, ceff, on="JEDITASKID", how="left")
 # future_data = new_preprocessor.filtered_data()
 
 df_ = preprocess_data(df_)
-#df_ = df_[df_["CPUTIMEUNIT"] == "HS06sPerEvent"].copy()
+df_ = df_[df_["CPUTIMEUNIT"] == "HS06sPerEvent"].copy()
 training_data = df_.sample(frac=0.9, random_state=42)
 future_data = df_[
     ~df_.index.isin(training_data.index)
 ]  # Get the remaining rows
-
+future_data = future_data[future_data["CPUTIMEUNIT"] == "HS06sPerEvent"].copy()
 
 #################################################################################################################
 #################################################################################################################
@@ -128,7 +128,7 @@ future_data = df_[
 #################################################################################################################
 print(df_.shape)
 print(training_data.shape)
-print(future_data.shape)
+print(c.shape)
 
 
 target_var = ["CTIME"]
@@ -169,7 +169,9 @@ categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
 print(training_data.shape)
 splitter = DataSplitter(training_data, selected_columns)
 train_df, test_df = splitter.split_data(test_size=0.15)
-
+print(train_df['CTIME'].max() ,train_df['CTIME'].min())
+print(test_df['CTIME'].max() ,test_df['CTIME'].min())
+print(future_data['CTIME'].max() ,future_data['CTIME'].min())
 # Preprocess the data
 
 numerical_features = [
@@ -201,7 +203,7 @@ tuned_model = pipeline.train_model(
     processed_train_data,
     processed_test_data,
     features_to_train,
-    "build_cputime",
+    "build_cputime_high",
     epoch=1,
     batch=200,
 )  # build_cputime
