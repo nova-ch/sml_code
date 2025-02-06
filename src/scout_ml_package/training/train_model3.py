@@ -228,7 +228,7 @@ actual_column_name = "CTIME"  # Change this to match your actual column name
 predicted_column_name = (
     "Predicted_CTIME"  # Change this to match your predicted column name
 )
-
+predictions = predictions.dropna()
 # Create an instance of the ErrorMetricsPlotter class
 plotter = ErrorMetricsPlotter(
     predictions,
