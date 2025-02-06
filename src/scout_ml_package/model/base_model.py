@@ -101,7 +101,7 @@ class MultiOutputModel:
         return model
 
     
-    def custom_activation(self, x):
+    def custom_activation_low(self, x):
         return tf.clip_by_value(x, 0.4, 8.5)
         
     def build_cputime_low(self) -> Model:
@@ -119,7 +119,7 @@ class MultiOutputModel:
             x, units=64, dropout_rate=0.3, activation="relu"
         )
         outputs = Dense(self.output_shape)(x)
-        outputs = tf.keras.layers.Lambda(self.custom_activation)(outputs)
+        outputs = tf.keras.layers.Lambda(self.custom_activation_low)(outputs)
         model = Model(inputs, outputs)
         model.compile(
             optimizer=self.optimizer,
@@ -128,6 +128,7 @@ class MultiOutputModel:
         )
         self.model = model
         return model
+        
     def weighted_mae(self, y_true, y_pred):
         mae = tf.abs(y_true - y_pred)
         # Progressive weighting for different ranges
@@ -135,16 +136,20 @@ class MultiOutputModel:
                       tf.where(y_true > 2000, 2.5,
                               tf.where(y_true > 1000, 2.0, 1.0)))
         return tf.reduce_mean(weights * mae)
+    
+    def custom_activation_high(self, x):
+        return tf.clip_by_value(x, 10, 5000)
+        
     def build_cputime_high(self) -> Model:
         """Build and compile the model for CPU time prediction."""
         inputs = Input(shape=(self.input_shape,))
         x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
         x = self._add_conv_block(
-            x, filters=512, kernel_size=3, activation="relu", pool_size=2
+            x, filters=512, kernel_size=3, activation="swish", pool_size=2
         )
         x = Flatten()(x)
         x = self._add_dense_block(
-            x, units=512, dropout_rate=0.4, activation="relu"
+            x, units=512, dropout_rate=0.4, activation="swish"
         )
         x = self._add_dense_block(
             x, units=256, dropout_rate=0.3, activation="relu"
@@ -153,7 +158,7 @@ class MultiOutputModel:
             x, units=128, dropout_rate=0.3, activation="relu"
         )
         outputs = Dense(self.output_shape, activation='linear')(x)
-        #outputs = tf.keras.layers.Lambda(self.custom_activation)(outputs)
+        outputs = tf.keras.layers.Lambda(self.custom_activation_high)(outputs)
         model = Model(inputs, outputs)
         model.compile(
             optimizer=self.optimizer,#tf.keras.optimizers.Adam(learning_rate=0.001), #
