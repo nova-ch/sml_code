@@ -156,9 +156,9 @@ class MultiOutputModel:
         outputs = tf.keras.layers.Lambda(self.custom_activation)(outputs)
         model = Model(inputs, outputs)
         model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), #self.optimizer,
-            loss= self.weighted_mae, #self.loss_function,
-            metrics=["RootMeanSquaredError", "mean_squared_error"],
+            optimizer=self.optimizer,#tf.keras.optimizers.Adam(learning_rate=0.001), #
+            loss= self.loss_function,#self.weighted_mae, #
+            metrics=["RootMeanSquaredError"],
         )
         self.model = model
         return model
