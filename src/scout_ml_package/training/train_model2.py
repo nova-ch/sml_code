@@ -162,6 +162,8 @@ training_data = training_data[
     (training_data["PRODSOURCELABEL"].isin(["user", "managed"]))
     & (training_data["CTIME"] > .4)
     & (training_data["CTIME"] < 9)
+    & (training_data["RAMCOUNT"] < 8000)
+    & (training_data["RAMCOUNT"] > 10)
     #& (training_data["CPUTIMEUNIT"] == "mHS06sPerEvent")
 ]
 categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
