@@ -213,7 +213,7 @@ tuned_model = pipeline.train_model(
     features_to_train,
     "build_cputime_high",
     epoch=100,
-    batch=128,
+    batch=150,
 )  # build_cputime
 predictions, y_pred = pipeline.regression_prediction(
     tuned_model, processed_future_data, features_to_train
@@ -242,6 +242,7 @@ predicted_column_name = (
     "Predicted_CTIME"  # Change this to match your predicted column name
 )
 predictions = predictions.dropna()
+
 print(predictions[predicted_column_name].max())
 print(predictions[predicted_column_name].value_counts())
 # Create an instance of the ErrorMetricsPlotter class
