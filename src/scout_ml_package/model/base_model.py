@@ -172,27 +172,27 @@ class MultiOutputModel:
         """Build and compile the model for CPU time prediction."""
         inputs = Input(shape=(self.input_shape,))
         x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
-        x = self._add_conv_block(
-            x, filters=1024, kernel_size=7, activation="swish", pool_size=2
-        )
+        # x = self._add_conv_block(
+        #     x, filters=1024, kernel_size=7, activation="swish", pool_size=2
+        # )
         x = self._add_conv_block(
             x, filters=512, kernel_size=5, activation="relu", pool_size=2
         )
         x = self._add_conv_block(
             x, filters=256, kernel_size=2, activation="relu", pool_size=2
         )
-        x = self._add_conv_block(
-            x, filters=32, kernel_size=2, activation="relu", pool_size=2
-        )
+        # x = self._add_conv_block(
+        #     x, filters=32, kernel_size=2, activation="relu", pool_size=2
+        # )
         x = Flatten()(x)
         x = self._add_dense_block(
             x, units=512, dropout_rate=0.4, activation="swish"
         )
+        # x = self._add_dense_block(
+        #     x, units=256, dropout_rate=0.3, activation="sigmoid"
+        # )
         x = self._add_dense_block(
-            x, units=256, dropout_rate=0.3, activation="sigmoid"
-        )
-        x = self._add_dense_block(
-            x, units=64, dropout_rate=0.3, activation="softplus"
+            x, units=128, dropout_rate=0.3, activation="relu"
         )
         #outputs = Dense(self.output_shape, activation='linear')(x)
         #outputs = tf.keras.layers.Lambda(self.custom_activation_high)(outputs)
