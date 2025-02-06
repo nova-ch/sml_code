@@ -115,7 +115,7 @@ new_preprocessor = HistoricalDataProcessor(task_new_data_path)
 # future_data = new_preprocessor.filtered_data()
 
 df_ = preprocess_data(df_)
-df_ = df_[df_["CPUTIMEUNIT"] == "mHS06sPerEvent"].copy()
+df_ = df_[df_["CPUTIMEUNIT"] == "HS06sPerEvent"].copy()
 training_data = df_.sample(frac=0.9, random_state=42)
 future_data = df_[
     ~df_.index.isin(training_data.index)
@@ -158,9 +158,9 @@ selected_columns = [
 # Further filter the training data based on specific criteria
 training_data = training_data[
     (training_data["PRODSOURCELABEL"].isin(["user", "managed"]))
-    & (training_data["CTIME"] > .4)
-    & (training_data["CTIME"] < 10)
-    & (training_data["CPUTIMEUNIT"] == "mHS06sPerEvent")
+    & (training_data["CTIME"] > 100)
+    & (training_data["CTIME"] < 5000)
+    & (training_data["CPUTIMEUNIT"] == "HS06sPerEvent")
 ]
 categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
 print(training_data.shape)
@@ -175,7 +175,6 @@ numerical_features = [
     "DISTINCT_DATASETNAME_COUNT",
     "RAMCOUNT"
 ]
-categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
 features = numerical_features + categorical_features
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@------------------
@@ -207,9 +206,6 @@ predictions, y_pred = pipeline.regression_prediction(
     tuned_model, processed_future_data, features_to_train
 )
 
-
-# model_storage_path = "ModelStorage/model2/"  # Define the storage path
-# model_name = "model2_cputime_low"  # Define the model name
 
 model_seq = "3"
 target_name = "cputime_high"
