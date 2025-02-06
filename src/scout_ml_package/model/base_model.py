@@ -113,18 +113,18 @@ class MultiOutputModel:
         )
         x = Flatten()(x)
         x = self._add_dense_block(
-            x, units=128, dropout_rate=0.4, activation="relu"
+            x, units=128, dropout_rate=0.4, activation="swish"
         )
         x = self._add_dense_block(
-            x, units=64, dropout_rate=0.3, activation="sigmoid"
+            x, units=64, dropout_rate=0.3, activation="relu"
         )
         outputs = Dense(self.output_shape)(x)
         outputs = tf.keras.layers.Lambda(custom_activation)(outputs)
         model = Model(inputs, outputs)
         model.compile(
             optimizer=self.optimizer,
-            loss=self.loss_function,
-            metrics=["mean_absolute_error", "mean_squared_error"],
+            loss= tf.keras.optimizers.Adam(learning_rate=0.01), #self.loss_function,
+            metrics=["RootMeanSquaredError", "mean_squared_error"],
         )
         self.model = model
         return model
