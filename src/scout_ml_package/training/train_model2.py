@@ -228,9 +228,6 @@ joblib.dump(fitted_scalar, f"{model_storage_path}/scaler.pkl")
 model_full_path = model_storage_path + model_name
 tuned_model.export(model_full_path)
 
-predictions = predictions.dropna()
-print(predictions[predicted_column_name].max())
-print(predictions[predicted_column_name].value_counts())
 
 # Specifying custom column names when instantiating the class
 actual_column_name = "CTIME"  # Change this to match your actual column name
@@ -238,6 +235,8 @@ predicted_column_name = (
     "Predicted_CTIME"  # Change this to match your predicted column name
 )
 predictions = predictions.dropna()
+print(predictions[predicted_column_name].max())
+print(predictions[predicted_column_name].value_counts())
 # Create an instance of the ErrorMetricsPlotter class
 plotter = ErrorMetricsPlotter(
     predictions,
