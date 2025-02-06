@@ -115,7 +115,7 @@ df_ = pd.merge(df_, ceff, on="JEDITASKID", how="left")
 # future_data = new_preprocessor.filtered_data()
 
 df_ = preprocess_data(df_)
-df_ = df_[df_["CPUTIMEUNIT"] == "mHS06sPerEvent"].copy()
+df_ = df_[df_["CPUTIMEUNIT"] == "HS06sPerEvent"].copy()
 training_data = df_.sample(frac=0.7, random_state=42)
 future_data = df_[
     ~df_.index.isin(training_data.index)
