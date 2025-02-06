@@ -124,7 +124,7 @@ df_ = df_[
     & (df_["CPUTIMEUNIT"] == "HS06sPerEvent")
 ]
 
-training_data = df_.sample(frac=0.9, random_state=42)
+training_data = df_.sample(frac=0.68, random_state=42)
 future_data = df_[
     ~df_.index.isin(training_data.index)
 ]  # Get the remaining rows
@@ -213,7 +213,7 @@ tuned_model = pipeline.train_model(
     features_to_train,
     "build_cputime_high",
     epoch=100,
-    batch=150,
+    batch=100,
 )  # build_cputime
 predictions, y_pred = pipeline.regression_prediction(
     tuned_model, processed_future_data, features_to_train
