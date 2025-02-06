@@ -140,7 +140,7 @@ class MultiOutputModel:
     def custom_activation_high(self, x):
         return tf.clip_by_value(x, 10, 5000)
         
-    def build_cputime_high(self) -> Model:
+    def build_cputime_high0(self) -> Model:
         """Build and compile the model for CPU time prediction."""
         inputs = Input(shape=(self.input_shape,))
         x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
@@ -164,6 +164,44 @@ class MultiOutputModel:
             optimizer=self.optimizer,#tf.keras.optimizers.Adam(learning_rate=0.001), #
             loss= self.weighted_mae,#self.loss_function,#self.weighted_mae, #
             metrics=["RootMeanSquaredError"],
+        )
+        self.model = model
+        return model
+
+    def build_cputime_high(self) -> Model:
+        """Build and compile the model for CPU time prediction."""
+        inputs = Input(shape=(self.input_shape,))
+        x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
+        x = self._add_conv_block(
+            x, filters=1024, kernel_size=7, activation="swish", pool_size=2
+        )
+        x = self._add_conv_block(
+            x, filters=512, kernel_size=5, activation="relu", pool_size=2
+        )
+        x = self._add_conv_block(
+            x, filters=256, kernel_size=2, activation="relu", pool_size=2
+        )
+        x = self._add_conv_block(
+            x, filters=32, kernel_size=2, activation="relu", pool_size=2
+        )
+        x = Flatten()(x)
+        x = self._add_dense_block(
+            x, units=512, dropout_rate=0.4, activation="swish"
+        )
+        x = self._add_dense_block(
+            x, units=256, dropout_rate=0.3, activation="sigmoid"
+        )
+        x = self._add_dense_block(
+            x, units=64, dropout_rate=0.3, activation="softplus"
+        )
+        #outputs = Dense(self.output_shape, activation='linear')(x)
+        #outputs = tf.keras.layers.Lambda(self.custom_activation_high)(outputs)
+        outputs = Dense(self.output_shape)(x)
+        model = Model(inputs, outputs)
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), # self.optimizer,#
+            loss= self.loss_function,#self.weighted_mae, #
+            metrics=["RootMeanSquaredError", "mean_absolute_error"],
         )
         self.model = model
         return model
