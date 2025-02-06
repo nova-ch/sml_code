@@ -200,7 +200,7 @@ tuned_model = pipeline.train_model(
     processed_test_data,
     features_to_train,
     "build_cputime_low",
-    epoch=150,
+    epoch=1,
     batch=200,
 )  # build_cputime
 predictions, y_pred = pipeline.regression_prediction(
@@ -232,7 +232,7 @@ actual_column_name = "CTIME"  # Change this to match your actual column name
 predicted_column_name = (
     "Predicted_CTIME"  # Change this to match your predicted column name
 )
-
+predictions = predictions.dropna()
 # Create an instance of the ErrorMetricsPlotter class
 plotter = ErrorMetricsPlotter(
     predictions,
