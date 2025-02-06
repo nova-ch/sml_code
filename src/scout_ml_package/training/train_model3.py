@@ -128,7 +128,7 @@ future_data = future_data[future_data["CPUTIMEUNIT"] == "HS06sPerEvent"].copy()
 #################################################################################################################
 print(df_.shape)
 print(training_data.shape)
-print(c.shape)
+print(future_data.shape)
 
 
 target_var = ["CTIME"]
