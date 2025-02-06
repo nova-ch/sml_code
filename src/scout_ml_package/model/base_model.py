@@ -101,7 +101,7 @@ class MultiOutputModel:
         return model
 
     
-    def custom_activation(x):
+    def custom_activation(self, x):
         return tf.clip_by_value(x, 0.4, 8.5)
         
     def build_cputime_low(self) -> Model:
@@ -119,7 +119,7 @@ class MultiOutputModel:
             x, units=64, dropout_rate=0.3, activation="relu"
         )
         outputs = Dense(self.output_shape)(x)
-        outputs = tf.keras.layers.Lambda(custom_activation)(outputs)
+        outputs = tf.keras.layers.Lambda(self.custom_activation)(outputs)
         model = Model(inputs, outputs)
         model.compile(
             optimizer=self.optimizer,
