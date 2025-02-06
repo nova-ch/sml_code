@@ -157,7 +157,7 @@ class MultiOutputModel:
         model = Model(inputs, outputs)
         model.compile(
             optimizer=self.optimizer,#tf.keras.optimizers.Adam(learning_rate=0.001), #
-            loss= self.loss_function,#self.weighted_mae, #
+            loss= self.weighted_mae,#self.loss_function,#self.weighted_mae, #
             metrics=["RootMeanSquaredError"],
         )
         self.model = model
