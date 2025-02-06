@@ -115,7 +115,15 @@ df_ = pd.merge(df_, ceff, on="JEDITASKID", how="left")
 # future_data = new_preprocessor.filtered_data()
 
 df_ = preprocess_data(df_)
-df_ = df_[df_["CPUTIMEUNIT"] == "HS06sPerEvent"].copy()
+df_ = df_[
+    (df_["PRODSOURCELABEL"].isin(["user", "managed"]))
+    & (df_["CTIME"] > 20)
+    & (df_["CTIME"] < 4000)
+    & (df_["RAMCOUNT"] < 8000)
+    & (df_["RAMCOUNT"] > 10)
+    & (df_["CPUTIMEUNIT"] == "HS06sPerEvent")
+]
+
 training_data = df_.sample(frac=0.9, random_state=42)
 future_data = df_[
     ~df_.index.isin(training_data.index)
@@ -157,14 +165,14 @@ selected_columns = [
 
 
 # Further filter the training data based on specific criteria
-training_data = training_data[
-    (training_data["PRODSOURCELABEL"].isin(["user", "managed"]))
-    & (training_data["CTIME"] > 20)
-    & (training_data["CTIME"] < 4000)
-    & (training_data["RAMCOUNT"] < 8000)
-    & (training_data["RAMCOUNT"] > 10)
-    #& (training_data["CPUTIMEUNIT"] == "HS06sPerEvent")
-]
+# training_data = training_data[
+#     (training_data["PRODSOURCELABEL"].isin(["user", "managed"]))
+#     & (training_data["CTIME"] > 20)
+#     & (training_data["CTIME"] < 4000)
+#     & (training_data["RAMCOUNT"] < 8000)
+#     & (training_data["RAMCOUNT"] > 10)
+#     #& (training_data["CPUTIMEUNIT"] == "HS06sPerEvent")
+# ]
 categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
 print(training_data.shape)
 splitter = DataSplitter(training_data, selected_columns)
@@ -234,6 +242,8 @@ predicted_column_name = (
     "Predicted_CTIME"  # Change this to match your predicted column name
 )
 predictions = predictions.dropna()
+print(predictions[predicted_column_name].max()]
+print(predictions[predicted_column_name].value_counts())
 # Create an instance of the ErrorMetricsPlotter class
 plotter = ErrorMetricsPlotter(
     predictions,
