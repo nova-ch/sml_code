@@ -118,8 +118,8 @@ df_ = preprocess_data(df_)
 df_ = df_[
     (df_["PRODSOURCELABEL"].isin(["user", "managed"]))
     & (df_["CTIME"] > 20)
-    & (df_["CTIME"] < 4000)
-    & (df_["RAMCOUNT"] < 8000)
+    & (df_["CTIME"] < 8000)
+    & (df_["RAMCOUNT"] < 10000)
     & (df_["RAMCOUNT"] > 10)
     & (df_["CPUTIMEUNIT"] == "HS06sPerEvent")
 ]
@@ -212,7 +212,7 @@ tuned_model = pipeline.train_model(
     processed_test_data,
     features_to_train,
     "build_cputime_high",
-    epoch=1,
+    epoch=100,
     batch=128,
 )  # build_cputime
 predictions, y_pred = pipeline.regression_prediction(
