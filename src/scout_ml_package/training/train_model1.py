@@ -60,7 +60,7 @@ def preprocess_data(df):
         df["CPUTIME"] / 1000,
         np.where(df["CPUTIMEUNIT"] == "HS06sPerEvent", df["CPUTIME"], None),
     )
-
+    df['CTIME'] = df['CTIME'].astype('float64')
     KEEP_F_TAG = [
         "Athena",
         "AnalysisBase",
@@ -91,7 +91,7 @@ def preprocess_data(df):
 
 
 base_path = "/data/model-data/"
-categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
+categorical_features = ['PRODSOURCELABEL', 'P', 'F', 'CORE', 'CPUTIMEUNIT']
 data = pd.read_parquet("/data/model-data/merged_files/c_task.parquet")
 dataset = pd.read_parquet("/data/model-data/merged_files/c_data.parquet")
 ceff = pd.read_parquet("/data/model-data/merged_files/c_eff.parquet")
@@ -155,7 +155,7 @@ training_data = training_data[
     & (training_data["RAMCOUNT"] > 100)
     & (training_data["RAMCOUNT"] < 8000)
 ]
-categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
+categorical_features = ['PRODSOURCELABEL', 'P', 'F', 'CORE', 'CPUTIMEUNIT']
 print(training_data.shape)
 splitter = DataSplitter(training_data, selected_columns)
 train_df, test_df = splitter.split_data(test_size=0.15)
@@ -167,7 +167,7 @@ numerical_features = [
     "TOTAL_NEVENTS",
     "DISTINCT_DATASETNAME_COUNT",
 ]
-categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
+categorical_features = ['PRODSOURCELABEL', 'P', 'F', 'CORE', 'CPUTIMEUNIT']
 features = numerical_features + categorical_features
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@------------------
