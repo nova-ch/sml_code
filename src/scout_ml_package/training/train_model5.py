@@ -194,7 +194,7 @@ numerical_features = [
     "TOTAL_NEVENTS",
     "DISTINCT_DATASETNAME_COUNT",
     "RAMCOUNT",
-    "cputime_HS",
+    "CTIME",
     "CPU_EFF",
 ]
 features = numerical_features + categorical_features
