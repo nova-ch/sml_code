@@ -94,7 +94,6 @@ def preprocess_data(df):
 
 
 base_path = "/data/model-data/"
-categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
 data = pd.read_parquet("/data/model-data/merged_files/c_task.parquet")
 dataset = pd.read_parquet("/data/model-data/merged_files/c_data.parquet")
 ceff = pd.read_parquet("/data/model-data/merged_files/c_eff.parquet")
@@ -141,6 +140,7 @@ print(future_data.shape)
 
 target_var = ["CTIME"]
 
+categorical_features = ['PRODSOURCELABEL', 'P', 'F', 'CORE', 'CPUTIMEUNIT']
 encoder = CategoricalEncoder()
 category_list = encoder.get_unique_values(
     training_data, categorical_features
@@ -163,17 +163,6 @@ selected_columns = [
     "IOINTENSITY",
 ]
 
-
-# Further filter the training data based on specific criteria
-# training_data = training_data[
-#     (training_data["PRODSOURCELABEL"].isin(["user", "managed"]))
-#     & (training_data["CTIME"] > 20)
-#     & (training_data["CTIME"] < 4000)
-#     & (training_data["RAMCOUNT"] < 8000)
-#     & (training_data["RAMCOUNT"] > 10)
-#     #& (training_data["CPUTIMEUNIT"] == "HS06sPerEvent")
-# ]
-categorical_features = ["PRODSOURCELABEL", "P", "F", "CORE"]
 print(training_data.shape)
 splitter = DataSplitter(training_data, selected_columns)
 train_df, test_df = splitter.split_data(test_size=0.15)
