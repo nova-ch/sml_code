@@ -227,7 +227,7 @@ tuned_model = pipeline.train_classification_model(
     processed_test_data,
     features_to_train,
     "build_io",
-    epoch=1,
+    epoch=100,
     batch=128,
 )  # build_cputime
 predictions, y_pred = pipeline.classification_prediction(
