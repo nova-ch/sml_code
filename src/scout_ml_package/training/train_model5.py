@@ -123,7 +123,7 @@ df_ = df_[
 
 df_['IOINTENSITY'] = np.where(df_['IOINTENSITY'] < 500, 'low', 'high')
 print("\nDataFrame with new column 'IntensityLevel':")
-print(df_['IOINTENSITY])
+print(df_['IOINTENSITY'])
 
       
 training_data = df_.sample(frac=0.9, random_state=42)
