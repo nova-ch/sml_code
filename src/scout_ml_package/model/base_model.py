@@ -10,6 +10,7 @@ from tensorflow.keras.layers import (
     MaxPooling1D,
     Flatten,
     Dropout,
+    Lambda
 )
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
@@ -249,6 +250,39 @@ class MultiOutputModel:
             optimizer=self.optimizer,
             loss=self.loss_function,
             metrics=["mean_absolute_error"],
+        )
+        self.model = model
+        return 
+
+    def custom_loss_cpu_eff(self, y_true, y_pred):
+        mse = tf.keras.losses.mean_squared_error(y_true, y_pred)
+        range_penalty = tf.reduce_mean(tf.maximum(0.0, 1.0 - y_pred) + tf.maximum(0.0, y_pred - 99.0))
+        return mse + 10.0 * range_penalty
+        
+    def build_cpu_eff(self) -> Model:
+        inputs = Input(shape=(self.input_shape,))
+        x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
+        x = self._add_conv_block(
+            x, filters=256, kernel_size=3, activation="relu", pool_size=2
+        )
+        x = self._add_conv_block(
+            x, filters=128, kernel_size=3, activation="relu", pool_size=2
+        )
+        x = Flatten()(x)
+        x = self._add_dense_block(
+            x, units=512, dropout_rate=0.4, activation="relu"
+        )
+        x = self._add_dense_block(
+            x, units=256, dropout_rate=0.3, activation="relu"
+        )
+        x = Dense(1)(x)
+        outputs = Lambda(lambda x: tf.clip_by_value(x, 1, 99))(x)
+        model = Model(inputs, outputs)
+        
+        model.compile(
+            optimizer=self.optimizer,
+            loss=self.custom_loss_cpu_eff,
+            metrics=["RootMeanSquaredError", "mean_absolute_error"],
         )
         self.model = model
         return model
