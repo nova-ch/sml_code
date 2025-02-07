@@ -198,7 +198,7 @@ tuned_model = pipeline.train_model(
     processed_train_data,
     processed_test_data,
     features_to_train,
-    "build_ramcount",
+    "test_build",
     epoch=1,
     batch=200,
 )  # build_cputime
