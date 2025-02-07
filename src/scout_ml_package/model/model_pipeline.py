@@ -350,50 +350,18 @@ class PredictionPipeline:
             "DISTINCT_DATASETNAME_COUNT",
         ]
         self.category_sequence = [
-            "PRODSOURCELABEL",
-            "P",
-            "F",
-            "CPUTIMEUNIT",
-            "CORE",
+            'PRODSOURCELABEL', 
+            'P', 
+            'F', 
+            'CORE', 
+            'CPUTIMEUNIT'
         ]
         self.unique_elements_categories = [
-            ["managed", "user"],
-            [
-                "deriv",
-                "jedi-run",
-                "jedi-athena",
-                "eventIndex",
-                "simul",
-                "evgen",
-                "merge",
-                "pile",
-                "athena-trf",
-                "recon",
-                "reprocessing",
-                "overlay",
-                "run-evp",
-                "trf-grl",
-                "gangarobot-athena",
-                "athena-evp",
-                "digit",
-            ],
-            [
-                "AthDerivation",
-                "AnalysisBase",
-                "Athena",
-                "AthGeneration",
-                "AtlasProduction",
-                "AtlasOffline",
-                "AthAnalysis",
-                "AnalysisTransforms",
-                "MCProd",
-                "AthSimulation",
-                "AtlasProd1",
-                "AtlasDerivation",
-                "AnalysisTop",
-            ],
-            ["HS06sPerEvent", "mHS06sPerEvent"],
-            ["M", "S"],
+            ['managed', 'user'], 
+            ['simul', 'jedi-run', 'deriv', 'pile', 'reprocessing', 'merge', 'jedi-athena', 'athena-trf', 'evgen', 'eventIndex', 'others', 'recon'], 
+            ['Athena', 'AnalysisBase', 'AthDerivation', 'AthAnalysis', 'AthGeneration', 'AtlasOffline', 'AthSimulation', 'others', 'MCProd'], 
+            ['M', 'S'], 
+            ['HS06sPerEvent', 'mHS06sPerEvent']
         ]
 
     def preprocess_data(self, df):
@@ -442,11 +410,11 @@ class PredictionPipeline:
             "DISTINCT_DATASETNAME_COUNT",
         ]
         categorical_features = [
-            "PRODSOURCELABEL",
-            "P",
-            "F",
-            "CPUTIMEUNIT",
-            "CORE",
+            'PRODSOURCELABEL', 
+            'P', 
+            'F', 
+            'CORE', 
+            'CPUTIMEUNIT'
         ]
         ["JEDITASKID"] + numerical_features + categorical_features
 
