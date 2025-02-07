@@ -116,7 +116,7 @@ df_ = df_[
     (df_["PRODSOURCELABEL"].isin(["user", "managed"]))
     & (df_["CTIME"] > .2)
     & (df_["CTIME"] < 10000)
-    & (df_["RAMCOUNT"] < 8000)
+    & (df_["RAMCOUNT"] < 4000)
     & (df_["RAMCOUNT"] > 100)
     & (df_["CPU_EFF"] > 10)
     & (df_["CPU_EFF"] < 99)
@@ -198,10 +198,10 @@ tuned_model = pipeline.train_model(
     processed_train_data,
     processed_test_data,
     features_to_train,
-    "test_build",
-    epoch=1,
+    "build_ramcount",
+    epoch=100,
     batch=200,
-)  # build_cputime
+)  
 predictions, y_pred = pipeline.regression_prediction(
     tuned_model, processed_future_data, features_to_train
 )
