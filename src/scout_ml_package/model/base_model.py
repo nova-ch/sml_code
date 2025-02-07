@@ -252,7 +252,8 @@ class MultiOutputModel:
             metrics=["mean_absolute_error"],
         )
         self.model = model
-        return 
+        return model
+
 
     def custom_loss_cpu_eff(self, y_true, y_pred):
         mse = tf.keras.losses.mean_squared_error(y_true, y_pred)
