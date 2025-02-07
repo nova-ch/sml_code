@@ -147,6 +147,11 @@ category_list = encoder.get_unique_values(
     training_data, categorical_features
 )  # Get unique values
 print(category_list)
+category_list = [['managed', 'user'],
+                              ['deriv', 'pile', 'jedi-run', 'simul', 'athena-trf', 'jedi-athena', 'recon', 'reprocessing', 'evgen', 'others', 'merge', 'eventIndex'],
+                              ['Athena', 'AtlasOffline', 'others', 'AthDerivation', 'AnalysisBase', 'AthAnalysis', 'AthSimulation', 'AthGeneration', 'MCProd'],
+                              ['M', 'S'], ["HS06sPerEvent", "mHS06sPerEvent"]
+]
 # Define the columns you want to select
 selected_columns = [
     "JEDITASKID",
