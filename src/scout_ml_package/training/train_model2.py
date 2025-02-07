@@ -200,7 +200,7 @@ tuned_model = pipeline.train_model(
     processed_test_data,
     features_to_train,
     "build_cputime_low",
-    epoch=100,
+    epoch=1,
     batch=200,
 )  # build_cputime
 predictions, y_pred = pipeline.regression_prediction(
