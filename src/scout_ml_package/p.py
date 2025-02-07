@@ -83,23 +83,23 @@ def get_prediction(model_manager, r):
                 )
 
                 if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
-                    base_df.loc[:, "cputime_HS"] = (
+                    base_df.loc[:, "CTIME"] = (
                         processor.make_predictions_for_model(
                             "2", features, base_df
                         )
                     )
                 else:
-                    base_df.loc[:, "cputime_HS"] = (
+                    base_df.loc[:, "CTIME"] = (
                         processor.make_predictions_for_model(
                             "3", features, base_df
                         )
                     )
                 DataValidator.check_predictions(
-                    base_df, "cputime_HS", acceptable_ranges
+                    base_df, "CTIME", acceptable_ranges
                 )
 
                 # Model 4: CPU_EFF
-                processor.numerical_features.append("cputime_HS")
+                processor.numerical_features.append("CTIME")
                 features = (
                     ["JEDITASKID"]
                     + processor.numerical_features
