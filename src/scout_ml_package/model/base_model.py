@@ -286,6 +286,27 @@ class MultiOutputModel:
         )
         self.model = model
         return model
+        
+    def build_io(self ) -> Model:
+        inputs = Input(shape=(self.input_shape,))
+        x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
+
+        # Convolutional layers with increasing complexity
+        x = self._add_conv_block(x, filters=512, kernel_size=7)
+        x = self._add_conv_block(x, filters=128, kernel_size=3)
+        x = Flatten()(x)
+        #x = self._add_dense_block(x, units=512, dropout_rate=0.5,act='sigmoid')
+        x = self._add_dense_block(x, units=256, dropout_rate=0.4,activation='sigmoid')
+        x = self._add_dense_block(x, units=64, dropout_rate=0.3,activation='relu')
+
+        # Use output_shape here
+        outputs = Dense(self.output_shape, activation='relu')(x)
+        model = Model(inputs, outputs)
+        model.compile(optimizer=self.optimizer, loss=self.loss_function,
+                      metrics=['accuracy'])
+
+        self.model = model
+        return model
 
     def _add_conv_block(
         self,
@@ -331,6 +352,8 @@ class MultiOutputModel:
                 tf.reduce_mean(tf.square(y_true - y_pred))
             ),
             "huber": tf.keras.losses.Huber(delta=7.0),
+            'categorical_crossentropy': tf.keras.losses.CategoricalCrossentropy(),
+            'binary_crossentropy': tf.keras.losses.BinaryCrossentropy(),
         }
         if loss_function not in loss_functions:
             raise ValueError(f"Unknown loss function: {loss_function}")
