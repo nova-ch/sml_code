@@ -98,20 +98,30 @@ ceff = pd.read_parquet("/data/model-data/merged_files/c_eff.parquet")
 df_ = pd.merge(data, dataset, on="JEDITASKID", how="right")
 df_ = pd.merge(df_, ceff, on="JEDITASKID", how="left")
 
-# task_train_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/training_historial.parquet'
-task_train_data_path = (
-    "/data/model-data/merged_files/training_historial.parquet"
-)
-processor = HistoricalDataProcessor(task_train_data_path)
+# # task_train_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/training_historial.parquet'
+# task_train_data_path = (
+#     "/data/model-data/merged_files/training_historial.parquet"
+# )
+# processor = HistoricalDataProcessor(task_train_data_path)
 
-# task_new_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/new_historial.parquet'
-task_new_data_path = "/data/model-data/merged_files/new_historial.parquet"
-new_preprocessor = HistoricalDataProcessor(task_new_data_path)
-# Filter the data
-# training_data = processor.filtered_data()
-# future_data = new_preprocessor.filtered_data()
+# # task_new_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/new_historial.parquet'
+# task_new_data_path = "/data/model-data/merged_files/new_historial.parquet"
+# new_preprocessor = HistoricalDataProcessor(task_new_data_path)
+# # Filter the data
+# # training_data = processor.filtered_data()
+# # future_data = new_preprocessor.filtered_data()
 
 df_ = preprocess_data(df_)
+df_ = df_[
+    (df_["PRODSOURCELABEL"].isin(["user", "managed"]))
+    & (df_["CTIME"] > .2)
+    & (df_["CTIME"] < 10000)
+    & (df_["RAMCOUNT"] < 8000)
+    & (df_["RAMCOUNT"] > 100)
+    & (df_["CPU_EFF"] > 10)
+    & (df_["CPU_EFF"] < 99)
+]
+
 training_data = df_.sample(frac=0.9, random_state=42)
 future_data = df_[
     ~df_.index.isin(training_data.index)
@@ -124,6 +134,7 @@ future_data = df_[
 #################################################################################################################
 
 target_var = ["RAMCOUNT"]
+categorical_features = ['PRODSOURCELABEL', 'P', 'F', 'CORE', 'CPUTIMEUNIT']
 
 
 encoder = CategoricalEncoder()
@@ -148,14 +159,6 @@ selected_columns = [
     "IOINTENSITY",
 ]
 
-
-# Further filter the training data based on specific criteria
-training_data = training_data[
-    (training_data["PRODSOURCELABEL"].isin(["user", "managed"]))
-    & (training_data["RAMCOUNT"] > 100)
-    & (training_data["RAMCOUNT"] < 8000)
-]
-categorical_features = ['PRODSOURCELABEL', 'P', 'F', 'CORE', 'CPUTIMEUNIT']
 print(training_data.shape)
 splitter = DataSplitter(training_data, selected_columns)
 train_df, test_df = splitter.split_data(test_size=0.15)
@@ -167,7 +170,6 @@ numerical_features = [
     "TOTAL_NEVENTS",
     "DISTINCT_DATASETNAME_COUNT",
 ]
-categorical_features = ['PRODSOURCELABEL', 'P', 'F', 'CORE', 'CPUTIMEUNIT']
 features = numerical_features + categorical_features
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@------------------
