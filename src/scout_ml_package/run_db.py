@@ -2,6 +2,7 @@ import oracledb
 import pandas as pd
 from scout_ml_package.data.fetch_db_data import DatabaseFetcher
 import sqlite3
+oracledb.init_oracle_client(config_dir='/data/model-data/configs', lib_dir="/opt/oracle/instantclient/instantclient_19_25")
 
 base_path = "/data/model-data/" 
 # Create instances for input and output databases

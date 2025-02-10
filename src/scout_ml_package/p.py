@@ -157,8 +157,7 @@ def get_prediction(model_manager, r):
         )
         logger.error(f"Error processing JEDITASKID {jeditaskid}: {str(e)}")
         return None
-
-
+import pandas as pd
 if __name__ == "__main__":
     df = DummyData.fetch_data()
     # base_path = "/Users/tasnuvachowdhury/Desktop/PROD/pandaml-test/src/"
@@ -169,7 +168,16 @@ if __name__ == "__main__":
     #db_fetcher = DatabaseFetcher()
     input_db = DatabaseFetcher('database')
     output_db = DatabaseFetcher('output_database')
+    #oracledb.init_oracle_client(
+    #config_dir='/data/model-data/configs',
+    #lib_dir="/opt/oracle/instantclient/instantclient_19_25"
+    #)
 
+    query = """
+    SELECT MAX(JediTaskID) FROM ATLAS_PANDA.PANDAMLTEST
+    """
+    test = pd.read_sql(query, con=output_db.get_connection())
+    print(test)
     sample_tasks = [27766704, 27746332]
     listener = FakeListener(sample_tasks, delay=3)  # Pass delay here
     for (

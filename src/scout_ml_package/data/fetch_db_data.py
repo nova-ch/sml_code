@@ -5,7 +5,10 @@ import pandas as pd
 import os
 import configparser
 
-
+oracledb.init_oracle_client(
+    config_dir='/data/model-data/configs',
+    lib_dir="/opt/oracle/instantclient/instantclient_19_25"
+    )
 class DatabaseFetcher:
     def __init__(self, db_config_name):
         self.db_config_name = db_config_name
