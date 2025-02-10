@@ -60,7 +60,7 @@ class DatabaseFetcher:
     def reconnect_if_needed(self):
         if not self.conn or not self.conn.is_healthy():
             self.close_connection()
-            self.conn = self.get_db_connection(self.db_config_name)
+            self.conn = self.get_db_connection()
             if not self.conn:
                 raise Exception("Failed to reconnect to the database.")
 
