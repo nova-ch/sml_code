@@ -168,11 +168,11 @@ if __name__ == "__main__":
     #db_fetcher = DatabaseFetcher()
     input_db = DatabaseFetcher('database')
     output_db = DatabaseFetcher('output_database')
-    #oracledb.init_oracle_client(
-    #config_dir='/data/model-data/configs',
-    #lib_dir="/opt/oracle/instantclient/instantclient_19_25"
-    #)
-
+    
+    cols_to_write = ['JEDITASKID', 'PRODSOURCELABEL', 'PROCESSINGTYPE', 'TRANSHOME',
+       'CPUTIMEUNIT', 'CORECOUNT', 'TOTAL_NFILES', 'TOTAL_NEVENTS',
+       'DISTINCT_DATASETNAME_COUNT', 'RAMCOUNT', 'CTIME', 'CPU_EFF',
+       'IOINTENSITY']
     query = """
     SELECT * FROM ATLAS_PANDA.PANDAMLTEST
     """
@@ -192,7 +192,8 @@ if __name__ == "__main__":
         if result is not None:
             logging.info("Processing completed successfully")
             print(result.columns)
-            #output_db.write_data(result, 'ATLAS_PANDA.PANDAMLTEST')
+            result = result[cols_to_write]
+            output_db.write_data(result, 'ATLAS_PANDA.PANDAMLTEST')
         else:
             logging.error("Processing failed due to invalid results or errors")
         print("Next Trial")
