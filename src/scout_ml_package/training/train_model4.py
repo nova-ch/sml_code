@@ -199,7 +199,7 @@ tuned_model = pipeline.train_model(
     processed_test_data,
     features_to_train,
     "build_cpu_eff",
-    epoch=1,
+    epoch=50,
     batch=128,
 )
 predictions, y_pred = pipeline.regression_prediction(

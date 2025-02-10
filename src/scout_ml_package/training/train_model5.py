@@ -115,9 +115,9 @@ df_ = df_[
     (df_["PRODSOURCELABEL"].isin(["user", "managed"]))
     & (df_["CTIME"] > .2)
     & (df_["CTIME"] < 10000)
-    & (df_["RAMCOUNT"] < 8000)
+    & (df_["RAMCOUNT"] < 9000)
     & (df_["RAMCOUNT"] > 1)
-    & (df_["CPU_EFF"] > 10)
+    & (df_["CPU_EFF"] > 1)
     & (df_["CPU_EFF"] < 99)
 ]
 
@@ -227,8 +227,8 @@ tuned_model = pipeline.train_classification_model(
     processed_test_data,
     features_to_train,
     "build_io",
-    epoch=100,
-    batch=128,
+    epoch=50,
+    batch=200,
 )  # build_cputime
 predictions, y_pred = pipeline.classification_prediction(
     tuned_model, processed_future_data, features_to_train
