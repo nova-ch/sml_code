@@ -130,7 +130,8 @@ def get_prediction(model_manager, r):
                 logging.info(
                     f"JEDITASKID {jeditaskid} processed successfully in {time.time() - start_time:.2f} seconds"
                 )
-                return base_df.round(3)
+                base_df = base_df.round(3)
+                return base_df
 
             else:
                 logger.error("DataFrame is empty for JEDITASKID.")
@@ -189,7 +190,7 @@ if __name__ == "__main__":
         # r = df[df['JEDITASKID'] == jeditaskid].copy()
         print(r)
         result = get_prediction(model_manager, r)
-        print(result.round(3))
+     
         if result is not None:
             logging.info("Processing completed successfully")
             print(result.columns)
