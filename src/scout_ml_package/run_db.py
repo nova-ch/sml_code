@@ -7,6 +7,19 @@ base_path = "/data/model-data/"
 input_db = DatabaseFetcher('database')
 output_db = DatabaseFetcher('output_database')
 
+try:
+    input_db = DatabaseFetcher('database')
+    output_db = DatabaseFetcher('output_database')
+
+    input_connection_status = input_db.conn is not None
+    output_connection_status = output_db.conn is not None
+
+    print(f"Input database connection status: {input_connection_status}")
+    print(f"Output database connection status: {output_connection_status}")
+
+except Exception as e:
+    print(f"An error occurred: {e}")
+
 sample_tasks = [27766704, 27746332]
 r = input_db.fetch_task_param(sample_tasks)
 
