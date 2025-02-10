@@ -176,18 +176,18 @@ class MultiOutputModel:
         # x = self._add_conv_block(
         #     x, filters=1024, kernel_size=7, activation="swish", pool_size=2
         # )
-        #x = self._add_conv_block(
-        #    x, filters=512, kernel_size=5, activation="relu", pool_size=2
-        #)
         x = self._add_conv_block(
-            x, filters=256, kernel_size=2, activation="relu", pool_size=2
+            x, filters=512, kernel_size=3, activation="relu", pool_size=2
         )
+        #x = self._add_conv_block(
+        #    x, filters=256, kernel_size=2, activation="relu", pool_size=2
+        #)
         # x = self._add_conv_block(
         #     x, filters=32, kernel_size=2, activation="relu", pool_size=2
         # )
         x = Flatten()(x)
         x = self._add_dense_block(
-            x, units=512, dropout_rate=0.4, activation="swish"
+            x, units=256, dropout_rate=0.4, activation="swish"
         )
         # x = self._add_dense_block(
         #     x, units=256, dropout_rate=0.3, activation="sigmoid"
