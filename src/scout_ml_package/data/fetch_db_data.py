@@ -53,12 +53,21 @@ class DatabaseFetcher:
 
         except Exception as e:
             print(f"Failed to connect to the database: {e}")
+            return None
+            
+    def reconnect_if_needed(self):
+        if not self.conn or not self.conn.is_healthy():
+            self.close_connection()
+            self.conn = self.get_db_connection()
+            if not self.conn:
+                raise Exception("Failed to reconnect to the database.")
 
     def fetch_task_param(self, jeditaskids):
+        self.reconnect_if_needed()
+
         if not isinstance(jeditaskids, list):
             jeditaskids = [jeditaskids]
 
-        # Create a string for SQL IN clause
         jeditaskid_str = ", ".join(map(str, jeditaskids))
 
         # Combined SQL query
@@ -90,6 +99,7 @@ class DatabaseFetcher:
 
     def get_connection(self):
         """Return the database connection."""
+        self.reconnect_if_needed()
         return self.conn
 
     def close_connection(self):
