@@ -130,7 +130,7 @@ def get_prediction(model_manager, r):
                 logging.info(
                     f"JEDITASKID {jeditaskid} processed successfully in {time.time() - start_time:.2f} seconds"
                 )
-                return base_df
+                return base_df.round(3)
 
             else:
                 logger.error("DataFrame is empty for JEDITASKID.")
@@ -192,7 +192,7 @@ if __name__ == "__main__":
         if result is not None:
             logging.info("Processing completed successfully")
             print(result.columns)
-            result = result[cols_to_write].round(3)
+            result = result[cols_to_write]
             output_db.write_data(result, 'ATLAS_PANDA.PANDAMLTEST')
         else:
             logging.error("Processing failed due to invalid results or errors")
