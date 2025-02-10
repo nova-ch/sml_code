@@ -1,6 +1,8 @@
 # src/scout_ml_package/prediction_pipeline.py
 import time
 import logging
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 from scout_ml_package.utils.demo import DummyData, DataValidator, FakeListener
 from scout_ml_package.model.model_pipeline import (
     ModelManager,
@@ -130,7 +132,7 @@ def get_prediction(model_manager, r):
                 logging.info(
                     f"JEDITASKID {jeditaskid} processed successfully in {time.time() - start_time:.2f} seconds"
                 )
-                base_df = base_df.round(3)
+                base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']] = base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']].round(3)
                 return base_df
 
             else:
