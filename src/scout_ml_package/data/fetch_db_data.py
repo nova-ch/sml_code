@@ -8,7 +8,7 @@ import configparser
 
 class DatabaseFetcher:
     def __init__(self, db_config_name):
-        self.db_config_name = self.db_config_name
+        self.db_config_name = db_config_name
         self.config = self.load_config()
         self.conn = self.get_db_connection()
 
@@ -24,19 +24,20 @@ class DatabaseFetcher:
         )
         print(f"Config file path: {config_path}")
         print(f"Config file exists: {os.path.exists(config_path)}")
-
+    
         # Read configuration file
         if not os.path.exists(config_path):
             raise FileNotFoundError(f"Config file not found at {config_path}")
-
+    
         config.read(config_path)
-
-        if db_config_name not in config:
-            raise KeyError("'database' section missing in config file")
-
+    
+        # Check if the specified section exists in the config file
+        if self.db_config_name not in config:
+            raise KeyError(f"'{self.db_config_name}' section missing in config file")
+    
         return config
 
-    def get_db_connection(self, db_config_name):
+    def get_db_connection(self):
         # Get database credentials
         database_user = self.config[self.db_config_name].get("user")
         database_password = self.config[self.db_config_name].get("password")
