@@ -7,7 +7,8 @@ import configparser
 
 
 class DatabaseFetcher:
-    def __init__(self):
+    def __init__(self, db_config_name):
+        self.db_config_name = db_config_name
         self.config = self.load_config()
         self.conn = self.get_db_connection()
 
@@ -30,16 +31,16 @@ class DatabaseFetcher:
 
         config.read(config_path)
 
-        if "database" not in config:
+        if db_config_name not in config:
             raise KeyError("'database' section missing in config file")
 
         return config
 
-    def get_db_connection(self):
+    def get_db_connection(self, db_config_name):
         # Get database credentials
-        database_user = self.config["database"].get("user")
-        database_password = self.config["database"].get("password")
-        dsn = self.config["database"].get("dsn")
+        database_user = self.config[db_config_name].get("user")
+        database_password = self.config[db_config_name].get("password")
+        dsn = self.config[db_config_name].get("dsn")
 
         try:
             # Establish connection with tcp_connect_timeout
@@ -58,7 +59,7 @@ class DatabaseFetcher:
     def reconnect_if_needed(self):
         if not self.conn or not self.conn.is_healthy():
             self.close_connection()
-            self.conn = self.get_db_connection()
+            self.conn = self.get_db_connection(self.db_config_name)
             if not self.conn:
                 raise Exception("Failed to reconnect to the database.")
 
@@ -97,6 +98,21 @@ class DatabaseFetcher:
         df = pd.read_sql(query, con=self.conn)
         return df
 
+    def write_data(self, data, table_name):
+        self.reconnect_if_needed()
+        try:
+            # Assuming data is a pandas DataFrame
+            data.to_sql(
+                name=table_name,
+                con=self.conn,
+                if_exists='append',  # Change to 'replace' if you want to replace existing data
+                index=False
+            )
+            self.conn.commit()
+            print(f"Data successfully written to {table_name}")
+        except Exception as e:
+            print(f"Failed to write data to {table_name}: {e}")
+
     def get_connection(self):
         """Return the database connection."""
         self.reconnect_if_needed()
@@ -110,6 +126,8 @@ class DatabaseFetcher:
             self.conn = None
         else:
             print("No active database connection to close.")
+    # def __init_subclass__(cls, db_config_name):
+    #     cls.db_config_name = db_config_name
 
 
 # # Example usage
