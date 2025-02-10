@@ -13,7 +13,7 @@ r = input_db.fetch_task_param(sample_tasks)
 print(r)
 
 query = """
-SELECT * FROM atlas_panda.pandamltest
+SELECT MAX(JediTaskID) FROM ATLAS_PANDA.PANDAMLTEST
 """
 df = pd.read_sql(query, con=output_db.get_connection())
 print(df)
