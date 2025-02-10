@@ -2,19 +2,11 @@
 import time
 import logging
 import os
-import tensorflow as tf
-import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 import absl.logging
 absl.logging.set_verbosity(absl.logging.ERROR)
-
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress all warnings and info messages
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-# Disable all GPUs
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
-# Verify that only CPU is being used
-print(tf.config.list_physical_devices('GPU'))  # Should return an empty list
 
 from scout_ml_package.utils.demo import DummyData, DataValidator, FakeListener
 from scout_ml_package.model.model_pipeline import (
