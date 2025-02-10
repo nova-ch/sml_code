@@ -38,9 +38,9 @@ class DatabaseFetcher:
 
     def get_db_connection(self, db_config_name):
         # Get database credentials
-        database_user = self.config[db_config_name].get("user")
-        database_password = self.config[db_config_name].get("password")
-        dsn = self.config[db_config_name].get("dsn")
+        database_user = self.config[self.db_config_name].get("user")
+        database_password = self.config[self.db_config_name].get("password")
+        dsn = self.config[self.db_config_name].get("dsn")
 
         try:
             # Establish connection with tcp_connect_timeout
