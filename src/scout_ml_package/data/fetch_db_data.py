@@ -8,7 +8,7 @@ import configparser
 
 class DatabaseFetcher:
     def __init__(self, db_config_name):
-        self.db_config_name = db_config_name
+        self.db_config_name = self.db_config_name
         self.config = self.load_config()
         self.conn = self.get_db_connection()
 
