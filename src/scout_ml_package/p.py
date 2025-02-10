@@ -192,20 +192,20 @@ if __name__ == "__main__":
         if result is not None:
             logging.info("Processing completed successfully")
             print(result.columns)
-            result = result[cols_to_write]
+            result = result[cols_to_write].round(3)
             output_db.write_data(result, 'ATLAS_PANDA.PANDAMLTEST')
         else:
             logging.error("Processing failed due to invalid results or errors")
         print("Next Trial")
         print(result)
 
-        # Add a 10-minute delay here
-        print("Waiting for 10 minutes before processing the next task...")
-        time.sleep(4)  # Reduced delay for testing
-        # "Wake up" actions
-        print("Waking up after 10 minutes sleep")
-        logging.info("Resuming execution after sleep period")
-        # You can add any other actions you want to perform after waking up here
+        # # Add a 10-minute delay here
+        # print("Waiting for 10 minutes before processing the next task...")
+        # time.sleep(4)  # Reduced delay for testing
+        # # "Wake up" actions
+        # print("Waking up after 10 minutes sleep")
+        # logging.info("Resuming execution after sleep period")
+        # # You can add any other actions you want to perform after waking up here
 
     print("All tasks processed")
     input_db.close_connection()
