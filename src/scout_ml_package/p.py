@@ -166,7 +166,9 @@ if __name__ == "__main__":
     model_manager = ModelManager(base_path)
     model_manager.load_models()
 
-    db_fetcher = DatabaseFetcher()
+    #db_fetcher = DatabaseFetcher()
+    input_db = DatabaseFetcher('database')
+    output_db = DatabaseFetcher('output_database')
 
     sample_tasks = [27766704, 27746332]
     listener = FakeListener(sample_tasks, delay=3)  # Pass delay here
@@ -174,7 +176,7 @@ if __name__ == "__main__":
         jeditaskid
     ) in listener.demo_task_listener():  # No arguments needed here
         print(f"Received JEDITASKID: {jeditaskid}")
-        r = db_fetcher.fetch_task_param(jeditaskid)
+        r = input_db.fetch_task_param(jeditaskid)
         # r = df[df['JEDITASKID'] == jeditaskid].copy()
         print(r)
         result = get_prediction(model_manager, r)
@@ -194,4 +196,4 @@ if __name__ == "__main__":
         # You can add any other actions you want to perform after waking up here
 
     print("All tasks processed")
-    db_fetcher.close_connection()
+    input_db.close_connection()
