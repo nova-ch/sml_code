@@ -3,7 +3,8 @@ import time
 import logging
 import os
 import tensorflow as tf
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress all warnings and info messages
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 # Disable all GPUs
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
