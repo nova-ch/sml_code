@@ -117,28 +117,40 @@ class DatabaseFetcher:
     #     except Exception as e:
     #         print(f"Failed to write data to {table_name}: {e}")
 
+  
     def write_data(self, data, table_name):
+        """
+        Write a pandas DataFrame to an Oracle database table.
+        
+        Args:
+            data (pd.DataFrame): The DataFrame containing data to be inserted.
+            table_name (str): The name of the target database table.
+        """
         self.reconnect_if_needed()
         try:
-            # Assuming data is a pandas DataFrame
+            # Create a cursor
             cursor = self.conn.cursor()
+
+            # Generate SQL placeholders for insertion
             columns = ', '.join(data.columns)
             placeholders = ', '.join([':' + str(i+1) for i in range(len(data.columns))])
             sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
 
-            # Convert DataFrame to list of tuples
-            rows = [tuple(row) for row in data.values]
+            # Convert DataFrame rows to a list of tuples
+            rows = [tuple(row) for row in data.itertuples(index=False)]
 
-            # Execute the query for each row
+            # Execute batch insertion
             cursor.executemany(sql, rows)
             self.conn.commit()
+
             print(f"Data successfully written to {table_name}")
         except Exception as e:
             print(f"Failed to write data to {table_name}: {e}")
-            self.conn.rollback()  # Rollback if there's an error
+            self.conn.rollback()  # Rollback in case of error
         finally:
             if 'cursor' in locals():
                 cursor.close()
+
                 
     def get_connection(self):
         """Return the database connection."""
