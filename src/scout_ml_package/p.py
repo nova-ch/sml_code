@@ -189,6 +189,7 @@ if __name__ == "__main__":
         # r = df[df['JEDITASKID'] == jeditaskid].copy()
         print(r)
         result = get_prediction(model_manager, r)
+        print(result.round(3))
         if result is not None:
             logging.info("Processing completed successfully")
             print(result.columns)
