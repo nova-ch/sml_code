@@ -102,21 +102,44 @@ class DatabaseFetcher:
         df = pd.read_sql(query, con=self.conn)
         return df
 
+    # def write_data(self, data, table_name):
+    #     self.reconnect_if_needed()
+    #     try:
+    #         # Assuming data is a pandas DataFrame
+    #         data.to_sql(
+    #             name=table_name,
+    #             con=self.conn,
+    #             if_exists='append',  # Change to 'replace' if you want to replace existing data
+    #             index=False
+    #         )
+    #         self.conn.commit()
+    #         print(f"Data successfully written to {table_name}")
+    #     except Exception as e:
+    #         print(f"Failed to write data to {table_name}: {e}")
+
     def write_data(self, data, table_name):
         self.reconnect_if_needed()
         try:
             # Assuming data is a pandas DataFrame
-            data.to_sql(
-                name=table_name,
-                con=self.conn,
-                if_exists='append',  # Change to 'replace' if you want to replace existing data
-                index=False
-            )
+            cursor = self.conn.cursor()
+            columns = ', '.join(data.columns)
+            placeholders = ', '.join([':' + str(i+1) for i in range(len(data.columns))])
+            sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+
+            # Convert DataFrame to list of tuples
+            rows = [tuple(row) for row in data.values]
+
+            # Execute the query for each row
+            cursor.executemany(sql, rows)
             self.conn.commit()
             print(f"Data successfully written to {table_name}")
         except Exception as e:
             print(f"Failed to write data to {table_name}: {e}")
-
+            self.conn.rollback()  # Rollback if there's an error
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+                
     def get_connection(self):
         """Return the database connection."""
         self.reconnect_if_needed()
