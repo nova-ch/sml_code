@@ -24,12 +24,6 @@ from scout_ml_package.data.fetch_db_data import DatabaseFetcher
 # )
 logger = logging.getLogger(__name__)
 
-# Add a single handler
-# handler = logging.StreamHandler()
-# formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-# handler.setFormatter(formatter)
-# logger.addHandler(handler)
-
 logger.setLevel(logging.INFO)
 
 # Create a formatter
