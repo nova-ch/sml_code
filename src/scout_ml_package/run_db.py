@@ -4,21 +4,16 @@ from scout_ml_package.data.fetch_db_data import DatabaseFetcher
 import sqlite3
 
 base_path = "/data/model-data/" 
+# Create instances for input and output databases
 input_db = DatabaseFetcher('database')
 output_db = DatabaseFetcher('output_database')
 
-try:
-    input_db = DatabaseFetcher('database')
-    output_db = DatabaseFetcher('output_database')
+# Check if connections are loaded successfully
+input_connection_status = input_db.conn is not None
+output_connection_status = output_db.conn is not None
 
-    input_connection_status = input_db.conn is not None
-    output_connection_status = output_db.conn is not None
-
-    print(f"Input database connection status: {input_connection_status}")
-    print(f"Output database connection status: {output_connection_status}")
-
-except Exception as e:
-    print(f"An error occurred: {e}")
+print(f"Input database connection status: {input_connection_status}")
+print(f"Output database connection status: {output_connection_status}")
 
 sample_tasks = [27766704, 27746332]
 r = input_db.fetch_task_param(sample_tasks)
