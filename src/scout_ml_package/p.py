@@ -178,6 +178,7 @@ if __name__ == "__main__":
     """
     test = pd.read_sql(query, con=output_db.get_connection())
     print(test)
+    print(test.columns)
     sample_tasks = [27766704, 27746332]
     listener = FakeListener(sample_tasks, delay=3)  # Pass delay here
     for (
@@ -190,6 +191,8 @@ if __name__ == "__main__":
         result = get_prediction(model_manager, r)
         if result is not None:
             logging.info("Processing completed successfully")
+            print(result.columns)
+            #output_db.write_data(result, 'ATLAS_PANDA.PANDAMLTEST')
         else:
             logging.error("Processing failed due to invalid results or errors")
         print("Next Trial")
