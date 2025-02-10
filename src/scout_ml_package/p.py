@@ -15,10 +15,6 @@ from scout_ml_package.model.model_pipeline import (
 )
 from scout_ml_package.data.fetch_db_data import DatabaseFetcher
 
-# Configure logging only once at the start of your script
-# logging.basicConfig(
-#    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-# )
 logger = logging.getLogger(__name__)
 
 logger.setLevel(logging.INFO)
@@ -48,6 +44,11 @@ acceptable_ranges = {
     "CPU_EFF": (0, 100),
 }
 
+additional_ctime_ranges = {
+    "low": (0.1, 10),
+    "high": (10, 10000),
+}
+
 
 def get_prediction(model_manager, r):
     start_time = time.time()
@@ -75,6 +76,14 @@ def get_prediction(model_manager, r):
                     base_df, "RAMCOUNT", acceptable_ranges
                 )
 
+                try:
+                    DataValidator.check_predictions(base_df, "RAMCOUNT", acceptable_ranges)
+                    logger.info("RAMCOUNT predictions validated successfully.")
+                except ValueError as ve:
+                    logger.error(f"RAMCOUNT validation failed for JEDITASKID {jeditaskid}: {ve}")
+                except Exception as e:
+                    logger.error(f"Unexpected error during RAMCOUNT validation for JEDITASKID {jeditaskid}: {e}")
+
                 # Model 2 and 3: cputime_HS
                 processor.numerical_features.append("RAMCOUNT")
                 features = (
@@ -98,6 +107,24 @@ def get_prediction(model_manager, r):
                 DataValidator.check_predictions(
                     base_df, "CTIME", acceptable_ranges
                 )
+
+                try:
+                    DataValidator.check_predictions(base_df, "CTIME", acceptable_ranges)
+                    logger.info("CTIME predictions passed validation with default range.")
+                except ValueError as ve:
+                    logger.warning(f"Validation failed with default range: {ve}")
+                    
+                    # Attempt alternative ranges
+                    try:
+                        if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
+                            DataValidator.check_predictions(base_df, "CTIME", {"CTIME": additional_ctime_ranges["low"]})
+                            logger.info("Validation passed with low CTIME range.")
+                        else:
+                            DataValidator.check_predictions(base_df, "CTIME", {"CTIME": additional_ctime_ranges["high"]})
+                            logger.info("Validation passed with high CTIME range.")
+                    except ValueError as ve_alt:
+                        logger.error(f"Validation failed with all ranges: {ve_alt}")
+                
 
                 # Model 4: CPU_EFF
                 processor.numerical_features.append("CTIME")
