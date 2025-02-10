@@ -4,6 +4,10 @@ import logging
 import os
 import tensorflow as tf
 import os
+
+import absl.logging
+absl.logging.set_verbosity(absl.logging.ERROR)
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress all warnings and info messages
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 # Disable all GPUs
