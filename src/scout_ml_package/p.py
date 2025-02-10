@@ -174,7 +174,7 @@ if __name__ == "__main__":
     #)
 
     query = """
-    SELECT MAX(JediTaskID) FROM ATLAS_PANDA.PANDAMLTEST
+    SELECT * FROM ATLAS_PANDA.PANDAMLTEST
     """
     test = pd.read_sql(query, con=output_db.get_connection())
     print(test)
