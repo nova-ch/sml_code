@@ -2,6 +2,9 @@
 import logging
 import os
 
+import logging
+import os
+
 def configure_logger(logger_name, log_dir_path, log_file_name='app.log', log_level=logging.DEBUG, console_level=logging.INFO):
     """
     Configures a logger with specified name and log file path.
@@ -25,6 +28,11 @@ def configure_logger(logger_name, log_dir_path, log_file_name='app.log', log_lev
     # Create a logger
     logger = logging.getLogger(logger_name)
     logger.setLevel(log_level)
+    logger.propagate = False  # Disable propagation to avoid duplicate logs
+
+    # Remove existing handlers to avoid duplicates
+    if logger.handlers:
+        logger.handlers.clear()
 
     # Create a formatter
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -46,10 +54,3 @@ def configure_logger(logger_name, log_dir_path, log_file_name='app.log', log_lev
     return logger
 
 
-
-# Usage
-# logger = configure_logger('demo_logger', '/data/model-data/logs', 'demo.log')
-
-# `log_dir_path`: Specifies the directory where the log file should be saved.
-# `log_file_name`: Specifies the name of the log file. If not provided, it defaults to `'app.log'`.
-# 	
