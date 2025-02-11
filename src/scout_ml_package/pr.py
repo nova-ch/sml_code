@@ -1,4 +1,3 @@
-import logging
 import time
 import pandas as pd
 from scout_ml_package.utils.demo import DummyData, DataValidator, FakeListener
@@ -6,25 +5,12 @@ from scout_ml_package.model.model_pipeline import (
     ModelManager,
     PredictionPipeline,
 )
+
+from scout_ml_package.utils.logger import configure_logger
 from scout_ml_package.data.fetch_db_data import DatabaseFetcher
+logger = configure_logger('prediction_logger', '/data/model-data/logs/prediction_logger.log')
 
-logger = logging.getLogger(__name__)
-
-logger.setLevel(logging.INFO)
-
-# Create a formatter
-formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-
-# Add a StreamHandler to print logs to the console
-stream_handler = logging.StreamHandler()
-stream_handler.setFormatter(formatter)
-logger.addHandler(stream_handler)
-
-# Add a FileHandler to write logs to a file
-log_path = "/data/model-data/logs/prediction_pipeline.log"
-file_handler = logging.FileHandler(log_path)
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
+logger = configure_logger('prediction_logger', 'logs/prediction_pipeline.log')
 
 # Define acceptable ranges for each prediction
 acceptable_ranges = {
@@ -186,5 +172,14 @@ if __name__ == "__main__":
         print("Next Trial")
         print(result)
 
+        # # Add a 10-minute delay here
+        # print("Waiting for 10 minutes before processing the next task...")
+        # time.sleep(4)  # Reduced delay for testing
+        # # "Wake up" actions
+        # print("Waking up after 10 minutes sleep")
+        # logger.info("Resuming execution after sleep period")
+        # # You can add any other actions you want to perform after waking up here
+
     print("All tasks processed")
     input_db.close_connection()
+
