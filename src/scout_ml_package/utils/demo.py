@@ -1,6 +1,6 @@
 import time
 import pandas as pd
-#import logging
+import logging
 
 from scout_ml_package.utils.logger import configure_logger
 #logger = configure_logger('demo_logger', '/data/model-data/logs/')
