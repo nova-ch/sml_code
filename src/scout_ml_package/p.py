@@ -210,7 +210,7 @@ def get_prediction(model_manager, r):
     
     if not DataValidator.validate_prediction(base_df, "RAMCOUNT", acceptable_ranges, jeditaskid):
         logger.error(f"RAMCOUNT validation failed for JEDITASKID {jeditaskid}.")
-        return f"{jeditaskid}M1 failure: Validation failed."
+        return f"M1 failure."
 
     # Update features for subsequent models
     processor.numerical_features.append("RAMCOUNT")
@@ -231,9 +231,9 @@ def get_prediction(model_manager, r):
             logger.error(f"CTIME validation failed for JEDITASKID {jeditaskid}.")
             cpu_unit = base_df["CPUTIMEUNIT"].values[0]
             if cpu_unit == "mHS06sPerEvent":
-                return f"{jeditaskid}M2 failure: Validation failed with low CTIME range."
+                return f"M2 failure"
             else:
-                return f"{jeditaskid}M3 failure: Validation failed with high CTIME range."
+                return f"M3 failure"
     except Exception as e:
         logger.error(f"CTIME prediction failed for JEDITASKID {jeditaskid}: {str(e)}")
         cpu_unit = base_df["CPUTIMEUNIT"].values[0]
@@ -257,8 +257,8 @@ def get_prediction(model_manager, r):
             logger.error(f"CPU_EFF validation failed for JEDITASKID {jeditaskid}.")
             return f"{jeditaskid}M4 failure: Validation failed."
     except Exception as e:
-        logger.error(f"{jeditaskid}M4 failure: {str(e)}")
-        return f"{jeditaskid}M4 failure: {str(e)}"
+        logger.error(f"{jeditaskid} M4 failure: {str(e)}")
+        return f"M4 failure: {str(e)}"
 
     # Update features for subsequent models
     processor.numerical_features.append("CPU_EFF")
@@ -273,7 +273,7 @@ def get_prediction(model_manager, r):
         base_df.loc[:, "IOINTENSITY"] = processor.make_predictions_for_model("5", features, base_df)
     except Exception as e:
         logger.error(f"{jeditaskid}M5 failure: {str(e)}")
-        return f"{jeditaskid}M5 failure: {str(e)}"
+        return f"M5 failure: {str(e)}"
 
     logger.info(
         f"JEDITASKID {jeditaskid} processed successfully in {time.time() - start_time:.2f} seconds"
@@ -308,7 +308,7 @@ if __name__ == "__main__":
     test = pd.read_sql(query, con=output_db.get_connection())
     print(test)
     print(test.columns)
-    sample_tasks = [27766704, 27746332, 30749131, 30752901]
+    sample_tasks = [30752901] #[27766704, 27746332, 30749131, 30752901]
     listener = FakeListener(sample_tasks, delay=6)  # Pass delay here
     for (
         jeditaskid
@@ -327,18 +327,15 @@ if __name__ == "__main__":
             output_db.write_data(result, 'ATLAS_PANDA.PANDAMLTEST')
         else:
             logging.error(f"Processing failed: {result}")
-            error_df = pd.DataFrame({
-                "JEDITASKID": [jeditaskid],  # Assuming jeditaskid is available
-                "ERROR": [result]
-            })
-            er_df = r.copy()
-            r['ERROR'] = result
+            error_df = r.copy()  # Copy the original DataFrame
+            error_df['ERROR'] = result  # Add the error message as a new column
+            # Remove any unnecessary columns
+            error_df = error_df[['JEDITASKID', 'ERROR']]
             # Add dummy columns if necessary to match the schema of the main table
             for col in cols_to_write:
-                if col not in er_df.columns:
+                if col not in error_df.columns:
                     error_df[col] = None
             output_db.write_data(error_df, 'ATLAS_PANDA.PANDAMLTEST')
-
         print("Next Trial")
         print(result)
 
