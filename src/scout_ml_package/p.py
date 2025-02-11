@@ -40,8 +40,8 @@ logger.info("Logging test: This should appear in both console and file.")
 # Define acceptable ranges for each prediction
 acceptable_ranges = {
     # Adjust these ranges based on your domain knowledge
-    "RAMCOUNT": (100, 10000),
-    "CTIME": (0.1, 10000),
+    "RAMCOUNT": (2500, 10000),
+    "CTIME": (300, 10000),
     "CPU_EFF": (0, 100),
 }
 
