@@ -181,9 +181,8 @@ def get_prediction(model_manager, r):
             DataValidator.validate_ctime_prediction(base_df, jeditaskid, acceptable_ranges, additional_ctime_ranges)
         except Exception as e:
             logger.error(f"Error processing CTIME for JEDITASKID {jeditaskid}: {str(e)}")
-            return None  # This should stop processing
+            return None
 
-        # Only proceed if CTIME was successful
         # Model 4: CPU_EFF
         processor.numerical_features.append("CTIME")
         features = (
@@ -277,13 +276,6 @@ if __name__ == "__main__":
         print("Next Trial")
         print(result)
 
-        # # Add a 10-minute delay here
-        # print("Waiting for 10 minutes before processing the next task...")
-        # time.sleep(4)  # Reduced delay for testing
-        # # "Wake up" actions
-        # print("Waking up after 10 minutes sleep")
-        # logger.info("Resuming execution after sleep period")
-        # # You can add any other actions you want to perform after waking up here
 
     print("All tasks processed")
     input_db.close_connection()
