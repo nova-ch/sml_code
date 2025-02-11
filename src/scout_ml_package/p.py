@@ -158,7 +158,7 @@ def get_prediction(model_manager, r):
                 logging.info(
                     f"JEDITASKID {jeditaskid} processed successfully in {time.time() - start_time:.2f} seconds"
                 )
-                base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']] = base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']].round(3)
+                base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']] = base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']].apply(lambda x: np.around(x, decimals=3))
                 return base_df
 
             else:
