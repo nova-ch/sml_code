@@ -41,13 +41,13 @@ logger.info("Logging test: This should appear in both console and file.")
 acceptable_ranges = {
     # Adjust these ranges based on your domain knowledge
     "RAMCOUNT": (100, 10000),
-    "CTIME": (300, 10000),
+    "CTIME": (0.1, 10000),
     "CPU_EFF": (0, 100),
 }
 
 additional_ctime_ranges = {
     "low": (0.1, 10),
-    "high": (10, 10000),
+    "high": (400, 10000),
 }
 
 
