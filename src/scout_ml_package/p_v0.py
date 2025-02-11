@@ -2,6 +2,12 @@
 
 import time
 import pandas as pd
+
+#import os
+#os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+#os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+#import tensorflow as tf
+
 from scout_ml_package.utils.demo import DummyData, DataValidator, FakeListener
 from scout_ml_package.model.model_pipeline import (
     ModelManager,
@@ -162,7 +168,7 @@ if __name__ == "__main__":
         print(result)
      
         if isinstance(result, pd.DataFrame):
-            logger.info("Processing completed successfully")
+            #logger.info("Processing completed successfully")
             print(result.columns)
             result = result[cols_to_write]
             output_db.write_data(result, 'ATLAS_PANDA.PANDAMLTEST')
@@ -178,7 +184,7 @@ if __name__ == "__main__":
                 if col not in error_df.columns:
                     error_df[col] = None
             output_db.write_data(error_df[cols_to_write+['ERROR']], 'ATLAS_PANDA.PANDAMLTEST')
-        print("Next Trial")
+        print("Next ID")
         print(result)
 
         # # Add a 10-minute delay here

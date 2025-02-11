@@ -1,6 +1,8 @@
 # src/scout_ml_package/model/model_pipeline.py
-import tensorflow as tf
 import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+import tensorflow as tf
 from scout_ml_package.model import MultiOutputModel
 from scout_ml_package.model.base_model import ModelTrainer  # , ModelPipeline
 from scout_ml_package.data import (

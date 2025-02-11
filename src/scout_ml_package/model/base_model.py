@@ -1,5 +1,7 @@
 # # src/scout_ml_package/model/base_model.py
-
+import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import (
