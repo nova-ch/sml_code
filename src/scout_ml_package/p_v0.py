@@ -1,12 +1,5 @@
-
-
 import time
 import pandas as pd
-
-#import os
-#os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-#os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-#import tensorflow as tf
 
 from scout_ml_package.utils.demo import DummyData, DataValidator, FakeListener
 from scout_ml_package.model.model_pipeline import (
@@ -14,12 +7,14 @@ from scout_ml_package.model.model_pipeline import (
     PredictionPipeline,
 )
 
-from scout_ml_package.utils.logger import configure_logger
+#from scout_ml_package.utils.logger import configure_logger
 from scout_ml_package.data.fetch_db_data import DatabaseFetcher
 #logger = configure_logger('prediction_logger', '/data/model-data/logs/prediction_logger.log')
-logger = configure_logger('demo_logger', '/data/model-data/logs', 'pred.log')
+#logger = configure_logger('demo_logger', '/data/model-data/logs', 'pred.log')
 
-logger.info("logger test: This should appear in both console and file.")
+from scout_ml_package.utils.logger import Logger
+
+logger = Logger('demo_logger', '/data/model-data/logs', 'pred.log').get_logger()
 
 # Define acceptable ranges for each prediction
 acceptable_ranges = {
