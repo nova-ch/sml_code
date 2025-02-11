@@ -3,7 +3,9 @@ import pandas as pd
 #import logging
 
 from scout_ml_package.utils.logger import configure_logger
-logger = configure_logger('demo_logger', '/data/model-data/logs/')
+#logger = configure_logger('demo_logger', '/data/model-data/logs/')
+
+logger = configure_logger('demo_logger', '/data/model-data/logs', 'demo.log')
 
 class FakeListener:
     def __init__(self, task_ids, delay=3):
