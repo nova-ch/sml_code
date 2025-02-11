@@ -24,8 +24,7 @@ from .model.model_pipeline import (
 )  # ModelLoader,
 from .utils.plotting import ErrorMetricsPlotter, ClassificationMetricsPlotter
 from .utils.validator import FakeListener, DummyData, DataValidator
-
-# from .utils.logger import Logger  # Import any utility classes or functions, if applicable
+from .utils.logger import Logger  
 
 __all__ = [
     "HistoricalDataProcessor",
@@ -50,6 +49,7 @@ __all__ = [
     "DummyData",
     "DataValidator",
     "DatabaseFetcher",
+    "Logger",
 ]
 
 # Optional: Example of initializing common configurations
