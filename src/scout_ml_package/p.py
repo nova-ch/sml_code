@@ -336,7 +336,7 @@ if __name__ == "__main__":
             for col in cols_to_write:
                 if col not in error_df.columns:
                     error_df[col] = None
-            output_db.write_data(error_df, 'ATLAS_PANDA.PANDAMLTEST')
+            output_db.write_data(error_df[cols_to_write+['ERROR']], 'ATLAS_PANDA.PANDAMLTEST')
         print("Next Trial")
         print(result)
 
