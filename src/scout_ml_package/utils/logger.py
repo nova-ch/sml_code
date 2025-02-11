@@ -1,4 +1,7 @@
 # File: scout_ml_package/utils/logger.py
+import logging
+import os
+
 def configure_logger(logger_name, log_dir_path, log_file_name='app.log', log_level=logging.DEBUG, console_level=logging.INFO):
     """
     Configures a logger with specified name and log file path.
@@ -13,8 +16,6 @@ def configure_logger(logger_name, log_dir_path, log_file_name='app.log', log_lev
     Returns:
     - A configured logger object.
     """
-    import os
-
     # Ensure the log directory exists
     os.makedirs(log_dir_path, exist_ok=True)
 
@@ -43,6 +44,8 @@ def configure_logger(logger_name, log_dir_path, log_file_name='app.log', log_lev
     logger.addHandler(stream_handler)
 
     return logger
+
+
 
 # Usage
 # logger = configure_logger('demo_logger', '/data/model-data/logs', 'demo.log')
