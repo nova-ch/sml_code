@@ -129,104 +129,105 @@ additional_ctime_ranges = {
 #         logger.error(f"Error processing JEDITASKID {jeditaskid}: {str(e)}")
 #         return None
 
-def get_prediction(model_manager, r):
-    start_time = time.time()
+import asyncio
 
+async def run_model(model_manager, r, model_id, features, base_df):
     try:
-        if r is None or r.empty:
-            return "Error: Input data is None or empty."
-
-        jeditaskid = r["JEDITASKID"].values[0]
-        processor = PredictionPipeline(model_manager)
-        base_df = processor.preprocess_data(r)
-
-        # Model 1: RAMCOUNT
-        features = (
-            ["JEDITASKID"]
-            + processor.numerical_features
-            + processor.category_sequence
-        )
-        try:
+        if model_id == "1":
             base_df.loc[:, "RAMCOUNT"] = (
-                processor.make_predictions_for_model(
-                    "1", features, base_df
+                model_manager.make_predictions_for_model(
+                    model_id, features, base_df
                 )
             )
-            DataValidator.validate_prediction(base_df, "RAMCOUNT", acceptable_ranges, jeditaskid)
-        except Exception as e:
-            return f"Error processing RAMCOUNT for JEDITASKID {jeditaskid}: {str(e)}"
-
-        # Model 2 and 3: cputime_HS
-        processor.numerical_features.append("RAMCOUNT")
-        features = (
-            ["JEDITASKID"]
-            + processor.numerical_features
-            + processor.category_sequence
-        )
-        try:
+            DataValidator.validate_prediction(base_df, "RAMCOUNT", acceptable_ranges, r["JEDITASKID"].values[0])
+        elif model_id in ["2", "3"]:
             if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
                 base_df.loc[:, "CTIME"] = (
-                    processor.make_predictions_for_model(
+                    model_manager.make_predictions_for_model(
                         "2", features, base_df
                     )
                 )
             else:
                 base_df.loc[:, "CTIME"] = (
-                    processor.make_predictions_for_model(
+                    model_manager.make_predictions_for_model(
                         "3", features, base_df
                     )
                 )
-            DataValidator.validate_ctime_prediction(base_df, jeditaskid, acceptable_ranges, additional_ctime_ranges)
-        except Exception as e:
-            return f"Error processing CTIME for JEDITASKID {jeditaskid}: {str(e)}"
-
-        # Model 4: CPU_EFF
-        processor.numerical_features.append("CTIME")
-        features = (
-            ["JEDITASKID"]
-            + processor.numerical_features
-            + processor.category_sequence
-        )
-        try:
+            DataValidator.validate_ctime_prediction(base_df, r["JEDITASKID"].values[0], acceptable_ranges, additional_ctime_ranges)
+        elif model_id == "4":
             base_df.loc[:, "CPU_EFF"] = (
-                processor.make_predictions_for_model(
-                    "4", features, base_df
+                model_manager.make_predictions_for_model(
+                    model_id, features, base_df
                 )
             )
-            DataValidator.validate_prediction(base_df, "CPU_EFF", acceptable_ranges, jeditaskid)
-        except Exception as e:
-            return f"Error processing CPU_EFF for JEDITASKID {jeditaskid}: {str(e)}"
-
-        # Model 5: IOINTENSITY
-        processor.numerical_features.append("CPU_EFF")
-        features = (
-            ["JEDITASKID"]
-            + processor.numerical_features
-            + processor.category_sequence
-        )
-        try:
+            DataValidator.validate_prediction(base_df, "CPU_EFF", acceptable_ranges, r["JEDITASKID"].values[0])
+        elif model_id == "5":
             base_df.loc[:, "IOINTENSITY"] = (
-                processor.make_predictions_for_model(
-                    "5", features, base_df
+                model_manager.make_predictions_for_model(
+                    model_id, features, base_df
                 )
             )
-        except Exception as e:
-            return f"Error processing IOINTENSITY for JEDITASKID {jeditaskid}: {str(e)}"
-
-        logger.info(
-            f"JEDITASKID {jeditaskid} processed successfully in {time.time() - start_time:.2f} seconds"
-        )
-        base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']] = base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']].round(3)
         return base_df
-
     except Exception as e:
-        jeditaskid = (
-            "Unknown" if r is None or r.empty else r["JEDITASKID"].values[0]
-        )
-        return f"Unexpected error processing JEDITASKID {jeditaskid}: {str(e)}"
+        return f"{r['JEDITASKID'].values[0]}M{model_id} failure: {str(e)}"
 
+async def get_prediction(model_manager, r):
+    start_time = time.time()
+    jeditaskid = r["JEDITASKID"].values[0]
+    processor = PredictionPipeline(model_manager)
+    base_df = processor.preprocess_data(r)
 
+    # Model 1: RAMCOUNT
+    features = (
+        ["JEDITASKID"]
+        + processor.numerical_features
+        + processor.category_sequence
+    )
+    result = await run_model(model_manager, r, "1", features, base_df)
+    if isinstance(result, str):
+        return result
 
+    # Model 2 and 3: cputime_HS
+    processor.numerical_features.append("RAMCOUNT")
+    features = (
+        ["JEDITASKID"]
+        + processor.numerical_features
+        + processor.category_sequence
+    )
+    result = await run_model(model_manager, r, "2" if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent" else "3", features, base_df)
+    if isinstance(result, str):
+        return result
+
+    # Model 4: CPU_EFF
+    processor.numerical_features.append("CTIME")
+    features = (
+        ["JEDITASKID"]
+        + processor.numerical_features
+        + processor.category_sequence
+    )
+    result = await run_model(model_manager, r, "4", features, base_df)
+    if isinstance(result, str):
+        return result
+
+    # Model 5: IOINTENSITY
+    processor.numerical_features.append("CPU_EFF")
+    features = (
+        ["JEDITASKID"]
+        + processor.numerical_features
+        + processor.category_sequence
+    )
+    result = await run_model(model_manager, r, "5", features, base_df)
+    if isinstance(result, str):
+        return result
+
+    logger.info(
+        f"JEDITASKID {jeditaskid} processed successfully in {time.time() - start_time:.2f} seconds"
+    )
+    result[['RAMCOUNT', 'CTIME', 'CPU_EFF']] = result[['RAMCOUNT', 'CTIME', 'CPU_EFF']].round(3)
+    return result
+
+def async_get_prediction(model_manager, r):
+    return asyncio.run(get_prediction(model_manager, r))
 
 
 if __name__ == "__main__":
@@ -259,7 +260,7 @@ if __name__ == "__main__":
         r = input_db.fetch_task_param(jeditaskid)
         # r = df[df['JEDITASKID'] == jeditaskid].copy()
         print(r)
-        result = get_prediction(model_manager, r)
+        result = async_get_prediction(model_manager, r)
         
         if isinstance(result, pd.DataFrame):
             logger.info("Processing completed successfully")
