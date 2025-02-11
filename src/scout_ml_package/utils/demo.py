@@ -1,6 +1,9 @@
 import time
 import pandas as pd
+#import logging
 
+from scout_ml_package.utils.logger import configure_logger
+logger = configure_logger('demo_logger', '/data/model-data/logs/')
 
 class FakeListener:
     def __init__(self, task_ids, delay=3):
@@ -20,6 +23,15 @@ class FakeListener:
             yield task_id
 
 
+# class DataValidator:
+#     @classmethod
+#     def check_predictions(cls, df, column, acceptable_ranges):
+#         min_val, max_val = acceptable_ranges[column]
+#         if df[column].min() < min_val or df[column].max() > max_val:
+#             raise ValueError(
+#                 f"Predictions for {column} are outside the acceptable range of {acceptable_ranges[column]}"
+#             )
+
 class DataValidator:
     @classmethod
     def check_predictions(cls, df, column, acceptable_ranges):
@@ -28,6 +40,55 @@ class DataValidator:
             raise ValueError(
                 f"Predictions for {column} are outside the acceptable range of {acceptable_ranges[column]}"
             )
+
+    @classmethod
+    def validate_prediction(cls, df, column, acceptable_ranges, jeditaskid):
+        """
+        Validates predictions for a given column and logs the result.
+
+        Parameters:
+        - df: DataFrame containing predictions.
+        - column: Column name to validate.
+        - acceptable_ranges: Acceptable ranges for validation.
+        - jeditaskid: ID for logging purposes.
+        """
+        try:
+            cls.check_predictions(df, column, acceptable_ranges)
+            logger.info(f"{column} predictions validated successfully.")
+        except ValueError as ve:
+            logger.error(f"{column} validation failed for JEDITASKID {jeditaskid}: {ve}")
+        except Exception as e:
+            logger.error(f"Unexpected error during {column} validation for JEDITASKID {jeditaskid}: {e}")
+
+    @classmethod
+    def validate_ctime_prediction(cls, df, jeditaskid, acceptable_ranges, additional_ctime_ranges):
+        """
+        Validates CTIME predictions with alternative ranges if necessary.
+
+        Parameters:
+        - df: DataFrame containing predictions.
+        - jeditaskid: ID for logging purposes.
+        - acceptable_ranges: Default acceptable ranges for validation.
+        - additional_ctime_ranges: Alternative ranges for CTIME validation.
+        """
+        try:
+            cls.check_predictions(df, "CTIME", acceptable_ranges)
+            logger.info("CTIME predictions passed validation with default range.")
+        except ValueError as ve:
+            logger.warning(f"Validation failed with default range: {ve}")
+            
+            # Attempt alternative ranges
+            try:
+                if df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
+                    cls.check_predictions(df, "CTIME", {"CTIME": additional_ctime_ranges["low"]})
+                    logger.info("Validation passed with low CTIME range.")
+                else:
+                    cls.check_predictions(df, "CTIME", {"CTIME": additional_ctime_ranges["high"]})
+                    logger.info("Validation passed with high CTIME range.")
+            except ValueError as ve_alt:
+                logger.error(f"Validation failed with all ranges: {ve_alt}")
+
+
 
 
 class DummyData:
