@@ -133,9 +133,10 @@ import asyncio
 
 async def run_model(model_manager, r, model_id, features, base_df):
     try:
+        processor = PredictionPipeline(model_manager)
         if model_id == "1":
             base_df.loc[:, "RAMCOUNT"] = (
-                model_manager.make_predictions_for_model(
+                processor.make_predictions_for_model(
                     model_id, features, base_df
                 )
             )
@@ -143,27 +144,27 @@ async def run_model(model_manager, r, model_id, features, base_df):
         elif model_id in ["2", "3"]:
             if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
                 base_df.loc[:, "CTIME"] = (
-                    model_manager.make_predictions_for_model(
+                    processor.make_predictions_for_model(
                         "2", features, base_df
                     )
                 )
             else:
                 base_df.loc[:, "CTIME"] = (
-                    model_manager.make_predictions_for_model(
+                    processor.make_predictions_for_model(
                         "3", features, base_df
                     )
                 )
             DataValidator.validate_ctime_prediction(base_df, r["JEDITASKID"].values[0], acceptable_ranges, additional_ctime_ranges)
         elif model_id == "4":
             base_df.loc[:, "CPU_EFF"] = (
-                model_manager.make_predictions_for_model(
+                processor.make_predictions_for_model(
                     model_id, features, base_df
                 )
             )
             DataValidator.validate_prediction(base_df, "CPU_EFF", acceptable_ranges, r["JEDITASKID"].values[0])
         elif model_id == "5":
             base_df.loc[:, "IOINTENSITY"] = (
-                model_manager.make_predictions_for_model(
+                processor.make_predictions_for_model(
                     model_id, features, base_df
                 )
             )
