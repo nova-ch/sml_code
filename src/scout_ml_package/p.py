@@ -231,19 +231,14 @@ def get_prediction(model_manager, r):
                             "3", features, base_df
                         )
                     )
-                if not DataValidator.validate_ctime_prediction(base_df, jeditaskid, acceptable_ranges, additional_ctime_ranges):
+                if not DataValidator.validate_ctime_prediction(base_df, jeditaskid, additional_ctime_ranges):
                     logger.error(f"CTIME validation failed for JEDITASKID {jeditaskid}.")
-                    if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
-                        return f"{jeditaskid}M2 failure: Validation failed."
+                    cpu_unit = base_df["CPUTIMEUNIT"].values[0]
+                    if cpu_unit == "mHS06sPerEvent":
+                        return f"{jeditaskid}M2 failure: Validation failed with low CTIME range."
                     else:
-                        return f"{jeditaskid}M3 failure: Validation failed."
-            except Exception as e:
-                if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
-                    logger.error(f"{jeditaskid}M2 failure: {str(e)}")
-                    return f"{jeditaskid}M2 failure: {str(e)}"
-                else:
-                    logger.error(f"{jeditaskid}M3 failure: {str(e)}")
-                    return f"{jeditaskid}M3 failure: {str(e)}"
+                        return f"{jeditaskid}M3 failure: Validation failed with high CTIME range."
+                
 
             # Proceed to Model 4 if Model 2/3 succeeds
             processor.numerical_features.append("CTIME")
