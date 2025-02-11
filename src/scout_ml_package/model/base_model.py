@@ -4,8 +4,8 @@ import pandas as pd
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-import matplotlib.pyplot as plt
-import seaborn as sns
+# import matplotlib.pyplot as plt
+# import seaborn as sns
 from typing import Union, Callable, Optional, List, Tuple
 
 import tensorflow as tf
@@ -519,64 +519,64 @@ class TrainedModel:
         )
 
 
-class PredictionVisualizer:
-    def __init__(self, trained_model: TrainedModel):
-        """
-        Initialize the PredictionVisualizer.
-
-        Args:
-            trained_model (TrainedModel): The trained model to visualize predictions for.
-        """
-        self.trained_model = trained_model
-
-    def plot_predictions(
-        self,
-        X_test: pd.DataFrame,
-        y_test: pd.DataFrame,
-        num_samples: int = 100,
-    ):
-        """
-        Plot predictions against actual values.
-
-        Args:
-            X_test (pd.DataFrame): The test input data.
-            y_test (pd.DataFrame): The test target data.
-            num_samples (int): Number of samples to plot. Defaults to 100.
-        """
-        y_pred = self.trained_model.predict(X_test)
-        num_targets = y_pred.shape[1]
-        fig, axes = plt.subplots(num_targets, 2, figsize=(15, 5 * num_targets))
-
-        for i in range(num_targets):
-            ax1 = axes[i, 0]
-            ax2 = axes[i, 1]
-
-            # Scatter plot
-            sns.scatterplot(
-                x=y_test.iloc[:num_samples, i],
-                y=y_pred[:num_samples, i],
-                ax=ax1,
-            )
-            ax1.set_xlabel("Actual")
-            ax1.set_ylabel("Predicted")
-            ax1.set_title(f"Target {i + 1} - Scatter Plot")
-
-            # Histogram plot
-            actual_values = y_test.iloc[:num_samples, i]
-            predicted_values = y_pred[:num_samples, i]
-            ax2.hist(
-                [actual_values, predicted_values],
-                bins=20,
-                label=["Actual", "Predicted"],
-                density=True,
-            )
-            ax2.set_xlabel("Value")
-            ax2.set_ylabel("Density")
-            ax2.set_title(f"Target {i + 1} - Histogram")
-            ax2.legend()
-
-        plt.tight_layout()
-        plt.show()
+# class PredictionVisualizer:
+#     def __init__(self, trained_model: TrainedModel):
+#         """
+#         Initialize the PredictionVisualizer.
+#
+#         Args:
+#             trained_model (TrainedModel): The trained model to visualize predictions for.
+#         """
+#         self.trained_model = trained_model
+#
+#     def plot_predictions(
+#         self,
+#         X_test: pd.DataFrame,
+#         y_test: pd.DataFrame,
+#         num_samples: int = 100,
+#     ):
+#         """
+#         Plot predictions against actual values.
+#
+#         Args:
+#             X_test (pd.DataFrame): The test input data.
+#             y_test (pd.DataFrame): The test target data.
+#             num_samples (int): Number of samples to plot. Defaults to 100.
+#         """
+#         y_pred = self.trained_model.predict(X_test)
+#         num_targets = y_pred.shape[1]
+#         fig, axes = plt.subplots(num_targets, 2, figsize=(15, 5 * num_targets))
+#
+#         for i in range(num_targets):
+#             ax1 = axes[i, 0]
+#             ax2 = axes[i, 1]
+#
+#             # Scatter plot
+#             sns.scatterplot(
+#                 x=y_test.iloc[:num_samples, i],
+#                 y=y_pred[:num_samples, i],
+#                 ax=ax1,
+#             )
+#             ax1.set_xlabel("Actual")
+#             ax1.set_ylabel("Predicted")
+#             ax1.set_title(f"Target {i + 1} - Scatter Plot")
+#
+#             # Histogram plot
+#             actual_values = y_test.iloc[:num_samples, i]
+#             predicted_values = y_pred[:num_samples, i]
+#             ax2.hist(
+#                 [actual_values, predicted_values],
+#                 bins=20,
+#                 label=["Actual", "Predicted"],
+#                 density=True,
+#             )
+#             ax2.set_xlabel("Value")
+#             ax2.set_ylabel("Density")
+#             ax2.set_title(f"Target {i + 1} - Histogram")
+#             ax2.legend()
+#
+#         plt.tight_layout()
+#         plt.show()
 
 
 class ModelPipeline:
