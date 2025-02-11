@@ -16,7 +16,7 @@ acceptable_ranges = {
     # Adjust these ranges based on your domain knowledge
     "RAMCOUNT": (100, 10000),
     "CTIME": (0.1, 10000),
-    "CPU_EFF": (95, 100),
+    "CPU_EFF": (1, 100),
 }
 
 additional_ctime_ranges = {
