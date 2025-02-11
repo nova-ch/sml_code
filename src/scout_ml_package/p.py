@@ -217,74 +217,77 @@ def get_prediction(model_manager, r):
                     return f"{jeditaskid}M1 failure: {str(e)}"
 
                 # Model 2 and 3: cputime_HS
-                processor.numerical_features.append("RAMCOUNT")
-                features = (
-                    ["JEDITASKID"]
-                    + processor.numerical_features
-                    + processor.category_sequence
-                )
-                try:
-                    if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
-                        base_df.loc[:, "CTIME"] = (
-                            processor.make_predictions_for_model(
-                                "2", features, base_df
-                            )
-                        )
-                    else:
-                        base_df.loc[:, "CTIME"] = (
-                            processor.make_predictions_for_model(
-                                "3", features, base_df
-                            )
-                        )
-                    DataValidator.validate_ctime_prediction(base_df, jeditaskid, acceptable_ranges, additional_ctime_ranges)
-                except Exception as e:
-                    if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
-                        logger.error(f"{jeditaskid}M2 failure: {str(e)}")
-                        return f"{jeditaskid}M2 failure: {str(e)}"
-                    else:
-                        logger.error(f"{jeditaskid}M3 failure: {str(e)}")
-                        return f"{jeditaskid}M3 failure: {str(e)}"
-
-                # Model 4: CPU_EFF
-                processor.numerical_features.append("CTIME")
-                features = (
-                    ["JEDITASKID"]
-                    + processor.numerical_features
-                    + processor.category_sequence
-                )
-                try:
-                    base_df.loc[:, "CPU_EFF"] = (
-                        processor.make_predictions_for_model(
-                            "4", features, base_df
-                        )
+                else:
+                    processor.numerical_features.append("RAMCOUNT")
+                    features = (
+                        ["JEDITASKID"]
+                        + processor.numerical_features
+                        + processor.category_sequence
                     )
-                    DataValidator.validate_prediction(base_df, "CPU_EFF", acceptable_ranges, jeditaskid)
-                except Exception as e:
-                    logger.error(f"{jeditaskid}M4 failure: {str(e)}")
-                    return f"{jeditaskid}M4 failure: {str(e)}"
+                    try:
+                        if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
+                            base_df.loc[:, "CTIME"] = (
+                                processor.make_predictions_for_model(
+                                    "2", features, base_df
+                                )
+                            )
+                        else:
+                            base_df.loc[:, "CTIME"] = (
+                                processor.make_predictions_for_model(
+                                    "3", features, base_df
+                                )
+                            )
+                        DataValidator.validate_ctime_prediction(base_df, jeditaskid, acceptable_ranges, additional_ctime_ranges)
+                    except Exception as e:
+                        if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
+                            logger.error(f"{jeditaskid}M2 failure: {str(e)}")
+                            return f"{jeditaskid}M2 failure: {str(e)}"
+                        else:
+                            logger.error(f"{jeditaskid}M3 failure: {str(e)}")
+                            return f"{jeditaskid}M3 failure: {str(e)}"
 
-                # Model 5: IOINTENSITY
-                processor.numerical_features.append("CPU_EFF")
-                features = (
-                    ["JEDITASKID"]
-                    + processor.numerical_features
-                    + processor.category_sequence
-                )
-                try:
-                    base_df.loc[:, "IOINTENSITY"] = (
-                        processor.make_predictions_for_model(
-                            "5", features, base_df
+                    # Model 4: CPU_EFF
+                    else:
+                        processor.numerical_features.append("CTIME")
+                        features = (
+                            ["JEDITASKID"]
+                            + processor.numerical_features
+                            + processor.category_sequence
                         )
-                    )
-                except Exception as e:
-                    logger.error(f"{jeditaskid}M5 failure: {str(e)}")
-                    return f"{jeditaskid}M5 failure: {str(e)}"
+                        try:
+                            base_df.loc[:, "CPU_EFF"] = (
+                                processor.make_predictions_for_model(
+                                    "4", features, base_df
+                                )
+                            )
+                            DataValidator.validate_prediction(base_df, "CPU_EFF", acceptable_ranges, jeditaskid)
+                        except Exception as e:
+                            logger.error(f"{jeditaskid}M4 failure: {str(e)}")
+                            return f"{jeditaskid}M4 failure: {str(e)}"
 
-                logger.info(
-                    f"JEDITASKID {jeditaskid} processed successfully in {time.time() - start_time:.2f} seconds"
-                )
-                base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']] = base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']].round(3)
-                return base_df
+                        # Model 5: IOINTENSITY
+                        else:
+                            processor.numerical_features.append("CPU_EFF")
+                            features = (
+                                ["JEDITASKID"]
+                                + processor.numerical_features
+                                + processor.category_sequence
+                            )
+                            try:
+                                base_df.loc[:, "IOINTENSITY"] = (
+                                    processor.make_predictions_for_model(
+                                        "5", features, base_df
+                                    )
+                                )
+                            except Exception as e:
+                                logger.error(f"{jeditaskid}M5 failure: {str(e)}")
+                                return f"{jeditaskid}M5 failure: {str(e)}"
+
+                            logger.info(
+                                f"JEDITASKID {jeditaskid} processed successfully in {time.time() - start_time:.2f} seconds"
+                            )
+                            base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']] = base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']].round(3)
+                            return base_df
 
             else:
                 logger.error("DataFrame is empty for JEDITASKID.")
@@ -311,6 +314,7 @@ def get_prediction(model_manager, r):
         )
         logger.error(f"Error processing JEDITASKID {jeditaskid}: {str(e)}")
         return None
+
 
 
 import pandas as pd
