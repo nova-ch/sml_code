@@ -1,7 +1,7 @@
 import time
 import pandas as pd
 
-from scout_ml_package.utils.demo import DummyData, DataValidator, FakeListener
+from scout_ml_package.utils.validator import DummyData, DataValidator, FakeListener
 from scout_ml_package.model.model_pipeline import (
     ModelManager,
     PredictionPipeline,
