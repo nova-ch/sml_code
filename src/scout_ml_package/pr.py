@@ -134,8 +134,7 @@ def get_prediction(model_manager, r):
 
     try:
         if r is None or r.empty:
-            logger.error("Input data is None or empty.")
-            return None
+            return "Error: Input data is None or empty."
 
         jeditaskid = r["JEDITASKID"].values[0]
         processor = PredictionPipeline(model_manager)
@@ -155,8 +154,7 @@ def get_prediction(model_manager, r):
             )
             DataValidator.validate_prediction(base_df, "RAMCOUNT", acceptable_ranges, jeditaskid)
         except Exception as e:
-            logger.error(f"Error processing RAMCOUNT for JEDITASKID {jeditaskid}: {str(e)}")
-            return None
+            return f"Error processing RAMCOUNT for JEDITASKID {jeditaskid}: {str(e)}"
 
         # Model 2 and 3: cputime_HS
         processor.numerical_features.append("RAMCOUNT")
@@ -180,8 +178,7 @@ def get_prediction(model_manager, r):
                 )
             DataValidator.validate_ctime_prediction(base_df, jeditaskid, acceptable_ranges, additional_ctime_ranges)
         except Exception as e:
-            logger.error(f"Error processing CTIME for JEDITASKID {jeditaskid}: {str(e)}")
-            return None
+            return f"Error processing CTIME for JEDITASKID {jeditaskid}: {str(e)}"
 
         # Model 4: CPU_EFF
         processor.numerical_features.append("CTIME")
@@ -198,8 +195,7 @@ def get_prediction(model_manager, r):
             )
             DataValidator.validate_prediction(base_df, "CPU_EFF", acceptable_ranges, jeditaskid)
         except Exception as e:
-            logger.error(f"Error processing CPU_EFF for JEDITASKID {jeditaskid}: {str(e)}")
-            return None
+            return f"Error processing CPU_EFF for JEDITASKID {jeditaskid}: {str(e)}"
 
         # Model 5: IOINTENSITY
         processor.numerical_features.append("CPU_EFF")
@@ -215,8 +211,7 @@ def get_prediction(model_manager, r):
                 )
             )
         except Exception as e:
-            logger.error(f"Error processing IOINTENSITY for JEDITASKID {jeditaskid}: {str(e)}")
-            return None
+            return f"Error processing IOINTENSITY for JEDITASKID {jeditaskid}: {str(e)}"
 
         logger.info(
             f"JEDITASKID {jeditaskid} processed successfully in {time.time() - start_time:.2f} seconds"
@@ -228,8 +223,8 @@ def get_prediction(model_manager, r):
         jeditaskid = (
             "Unknown" if r is None or r.empty else r["JEDITASKID"].values[0]
         )
-        logger.error(f"Unexpected error processing JEDITASKID {jeditaskid}: {str(e)}")
-        return None
+        return f"Unexpected error processing JEDITASKID {jeditaskid}: {str(e)}"
+
 
 
 
@@ -265,18 +260,28 @@ if __name__ == "__main__":
         # r = df[df['JEDITASKID'] == jeditaskid].copy()
         print(r)
         result = get_prediction(model_manager, r)
-     
-        if result is not None:
+        
+        if isinstance(result, pd.DataFrame):
             logger.info("Processing completed successfully")
             print(result.columns)
             result = result[cols_to_write]
             output_db.write_data(result, 'ATLAS_PANDA.PANDAMLTEST')
         else:
-            logger.error("Processing failed due to invalid results or errors")
-        print("Next Trial")
-        print(result)
+            logger.error(f"Processing failed: {result}")
+            print(f"Error: {result}")
 
+        print("Next Trial")
+        print(result if isinstance(result, pd.DataFrame) else result)
+
+        # # Add a 10-minute delay here
+        # print("Waiting for 10 minutes before processing the next task...")
+        # time.sleep(4)  # Reduced delay for testing
+        # # "Wake up" actions
+        # print("Waking up after 10 minutes sleep")
+        # logger.info("Resuming execution after sleep period")
+        # # You can add any other actions you want to perform after waking up here
 
     print("All tasks processed")
     input_db.close_connection()
+
 
