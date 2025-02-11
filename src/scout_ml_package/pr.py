@@ -181,8 +181,9 @@ def get_prediction(model_manager, r):
             DataValidator.validate_ctime_prediction(base_df, jeditaskid, acceptable_ranges, additional_ctime_ranges)
         except Exception as e:
             logger.error(f"Error processing CTIME for JEDITASKID {jeditaskid}: {str(e)}")
-            return None
+            return None  # Return immediately if CTIME fails
 
+        # Only proceed if CTIME was successful
         # Model 4: CPU_EFF
         processor.numerical_features.append("CTIME")
         features = (
@@ -230,6 +231,7 @@ def get_prediction(model_manager, r):
         )
         logger.error(f"Unexpected error processing JEDITASKID {jeditaskid}: {str(e)}")
         return None
+
 
 
 if __name__ == "__main__":
