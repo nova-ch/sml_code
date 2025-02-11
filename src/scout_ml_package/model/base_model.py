@@ -1,7 +1,13 @@
 # # src/scout_ml_package/model/base_model.py
+import numpy as np
+import pandas as pd
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+import matplotlib.pyplot as plt
+import seaborn as sns
+from typing import Union, Callable, Optional, List, Tuple
+
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import (
@@ -17,13 +23,7 @@ from tensorflow.keras.layers import (
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from typing import Union, Callable, Optional, List, Tuple
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-
 from scout_ml_package.data import TrainingDataPreprocessor, NewDataPreprocessor
 
 
