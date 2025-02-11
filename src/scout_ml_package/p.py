@@ -331,9 +331,11 @@ if __name__ == "__main__":
                 "JEDITASKID": [jeditaskid],  # Assuming jeditaskid is available
                 "ERROR": [result]
             })
+            er_df = r.copy()
+            r['ERROR'] = result
             # Add dummy columns if necessary to match the schema of the main table
             for col in cols_to_write:
-                if col not in error_df.columns:
+                if col not in er_df.columns:
                     error_df[col] = None
             output_db.write_data(error_df, 'ATLAS_PANDA.PANDAMLTEST')
 
