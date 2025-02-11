@@ -8,9 +8,8 @@ from scout_ml_package.model.model_pipeline import (
 
 from scout_ml_package.utils.logger import configure_logger
 from scout_ml_package.data.fetch_db_data import DatabaseFetcher
-logger = configure_logger('prediction_logger', '/data/model-data/logs/prediction_logger.log')
-
-logger = configure_logger('prediction_logger', 'logs/prediction_pipeline.log')
+#logger = configure_logger('prediction_logger', '/data/model-data/logs/prediction_logger.log')
+logger = configure_logger('demo_logger', '/data/model-data/logs', 'pred.log')
 
 # Define acceptable ranges for each prediction
 acceptable_ranges = {
