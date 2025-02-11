@@ -23,7 +23,7 @@ from .model.model_pipeline import (
     ModelHandlerInProd,
 )  # ModelLoader,
 from .utils.plotting import ErrorMetricsPlotter, ClassificationMetricsPlotter
-from .utils.demo import FakeListener, DummyData, DataValidator
+from .utils.validator import FakeListener, DummyData, DataValidator
 
 # from .utils.logger import Logger  # Import any utility classes or functions, if applicable
 
