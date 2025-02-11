@@ -308,7 +308,7 @@ if __name__ == "__main__":
     test = pd.read_sql(query, con=output_db.get_connection())
     print(test)
     print(test.columns)
-    sample_tasks = [30752901] #[27766704, 27746332, 30749131, 30752901]
+    sample_tasks = [30752901, 27766704, 30749131] #[27766704, 27746332, 30749131, 30752901]
     listener = FakeListener(sample_tasks, delay=6)  # Pass delay here
     for (
         jeditaskid
