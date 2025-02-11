@@ -331,7 +331,7 @@ if __name__ == "__main__":
             error_df = r.copy()  # Copy the original DataFrame
             error_df['ERROR'] = result  # Add the error message as a new column
             # Remove any unnecessary columns
-            error_df = error_df[['JEDITASKID', 'ERROR']]
+            #error_df = error_df[['JEDITASKID', 'ERROR']]
             # Add dummy columns if necessary to match the schema of the main table
             for col in cols_to_write:
                 if col not in error_df.columns:
