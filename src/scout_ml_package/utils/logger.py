@@ -10,9 +10,13 @@ class Logger:
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
-            cls._instance = super(Logger, cls).__new__(cls, *args, **kwargs)
-            cls._instance.logger = cls.configure_logger(*args, **kwargs)
+            cls._instance = super(Logger, cls).__new__(cls)  # Create instance without args
+            cls._instance.init(*args, **kwargs)  # Initialize with args
         return cls._instance
+
+    def init(self, logger_name, log_dir_path, log_file_name='app.log', log_level=logging.DEBUG, console_level=logging.INFO):
+        # Your logger configuration code here
+        self.logger = self.configure_logger(logger_name, log_dir_path, log_file_name, log_level, console_level)
 
     @staticmethod
     def configure_logger(logger_name, log_dir_path, log_file_name='app.log', log_level=logging.DEBUG, console_level=logging.INFO):
