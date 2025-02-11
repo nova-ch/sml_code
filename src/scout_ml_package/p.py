@@ -302,12 +302,12 @@ if __name__ == "__main__":
        'CPUTIMEUNIT', 'CORECOUNT', 'TOTAL_NFILES', 'TOTAL_NEVENTS',
        'DISTINCT_DATASETNAME_COUNT', 'RAMCOUNT', 'CTIME', 'CPU_EFF',
        'IOINTENSITY']
-    query = """
-    SELECT * FROM ATLAS_PANDA.PANDAMLTEST
-    """
-    test = pd.read_sql(query, con=output_db.get_connection())
-    print(test)
-    print(test.columns)
+    # query = """
+    # SELECT * FROM ATLAS_PANDA.PANDAMLTEST
+    # """
+    # test = pd.read_sql(query, con=output_db.get_connection())
+    # print(test)
+    # print(test.columns)
     sample_tasks = [30752901, 27766704, 30749131] #[27766704, 27746332, 30749131, 30752901]
     listener = FakeListener(sample_tasks, delay=6)  # Pass delay here
     for (
@@ -327,6 +327,7 @@ if __name__ == "__main__":
             output_db.write_data(result, 'ATLAS_PANDA.PANDAMLTEST')
         else:
             logging.error(f"Processing failed: {result}")
+            print(r)
             error_df = r.copy()  # Copy the original DataFrame
             error_df['ERROR'] = result  # Add the error message as a new column
             # Remove any unnecessary columns
