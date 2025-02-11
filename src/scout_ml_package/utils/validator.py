@@ -25,14 +25,6 @@ class FakeListener:
             yield task_id
 
 
-# class DataValidator:
-#     @classmethod
-#     def check_predictions(cls, df, column, acceptable_ranges):
-#         min_val, max_val = acceptable_ranges[column]
-#         if df[column].min() < min_val or df[column].max() > max_val:
-#             raise ValueError(
-#                 f"Predictions for {column} are outside the acceptable range of {acceptable_ranges[column]}"
-#             )
 
 class DataValidator:
     @classmethod
@@ -60,7 +52,7 @@ class DataValidator:
         """
         try:
             cls.check_predictions(df, column, acceptable_ranges)
-            logger.info(f"{column} predictions validated successfully.")
+            #logger.info(f"{column} predictions validated successfully.")
             return True
         except ValueError as ve:
             logger.error(f"{column} validation failed for JEDITASKID {jeditaskid}: {ve}")
@@ -95,43 +87,6 @@ class DataValidator:
             logger.error(f"Validation failed with all ranges: {ve}")
             return False
 
-    # @classmethod
-    # def validate_ctime_prediction(cls, df, jeditaskid, acceptable_ranges, additional_ctime_ranges):
-    #     """
-    #     Validates CTIME predictions with alternative ranges if necessary.
-
-    #     Parameters:
-    #     - df: DataFrame containing predictions.
-    #     - jeditaskid: ID for logging purposes.
-    #     - acceptable_ranges: Default acceptable ranges for validation.
-    #     - additional_ctime_ranges: Alternative ranges for CTIME validation.
-
-    #     Returns:
-    #     - bool: True if validation succeeds, False otherwise.
-    #     """
-    #     try:
-    #         cls.check_predictions(df, "CTIME", acceptable_ranges)
-    #         logger.info("CTIME predictions passed validation with default range.")
-    #         return True
-    #     except ValueError as ve:
-    #         logger.warning(f"Validation failed with default range: {ve}")
-            
-    #         # Attempt alternative ranges
-    #         try:
-    #             if df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
-    #                 cls.check_predictions(df, "CTIME", {"CTIME": additional_ctime_ranges["low"]})
-    #                 logger.info("Validation passed with low CTIME range.")
-    #                 return True
-    #             else:
-    #                 cls.check_predictions(df, "CTIME", {"CTIME": additional_ctime_ranges["high"]})
-    #                 logger.info("Validation passed with high CTIME range.")
-    #                 return True
-    #         except ValueError as ve_alt:
-    #             logger.error(f"Validation failed with all ranges: {ve_alt}")
-    #             return False
-
-
-
 
 
 
@@ -155,34 +110,3 @@ class DummyData:
         }
         return pd.DataFrame(data)
 
-
-#
-# # Example usage
-# if __name__ == "__main__":
-#     task_ids = [27766704, 27746332]
-#     task_manager = TaskManager(task_ids, delay=3)
-#
-#     data_fetcher = DataFetcher()
-#     df = data_fetcher.fetch_data()
-#
-#     acceptable_ranges = {
-#         'RAMCOUNT': (100, 10000),
-#         'cputime_HS': (0.4, 10000),
-#         'CPU_EFF': (0, 100)
-#     }
-#     data_validator = DataValidator(acceptable_ranges)
-#
-#     for jeditaskid in task_manager.demo_task_listener():
-#         print(f"Received JEDITASKID: {jeditaskid}")
-#         r = df[df['JEDITASKID'] == jeditaskid].copy()
-#         print(r)
-#
-#         # Example of using data_validator
-#         # data_validator.check_predictions(r, 'RAMCOUNT')
-#
-#         print("Next Trial")
-#         print("Waiting for 10 minutes before processing the next task...")
-#         time.sleep(4)  # Reduced delay for testing
-#         print("Waking up after 10 minutes sleep")
-#
-#     print("All tasks processed")
