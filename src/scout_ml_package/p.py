@@ -348,13 +348,13 @@ if __name__ == "__main__":
         result = get_prediction(model_manager, r)
         print(result)
      
-        if result is not None:
+        if isinstance(result, pd.DataFrame):
             logging.info("Processing completed successfully")
             print(result.columns)
             result = result[cols_to_write]
             output_db.write_data(result, 'ATLAS_PANDA.PANDAMLTEST')
         else:
-            logging.error("Processing failed due to invalid results or errors")
+            logging.error(f"Processing failed: {result}")
         print("Next Trial")
         print(result)
 
