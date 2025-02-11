@@ -1,68 +1,42 @@
 # File: scout_ml_package/utils/logger.py
 import logging
-from logging.handlers import RotatingFileHandler
-import os
-import sys
 
+def configure_logger(logger_name, log_file_path, log_level=logging.DEBUG, console_level=logging.INFO):
+    """
+    Configures a logger with specified name and log file path.
 
-class StreamToLogger(object):
-    def __init__(self, logger, log_level=logging.INFO):
-        self.logger = logger
-        self.log_level = log_level
-        self.linebuf = ""
+    Parameters:
+    - logger_name: Name of the logger.
+    - log_file_path: Path to the log file.
+    - log_level: Logging level for the file handler (default: DEBUG).
+    - console_level: Logging level for the console handler (default: INFO).
 
-    def write(self, buf):
-        for line in buf.rstrip().splitlines():
-            self.logger.log(self.log_level, line.rstrip())
+    Returns:
+    - A configured logger object.
+    """
+    # Create a logger
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(log_level)
 
-    def flush(self):
-        pass
+    # Create a formatter
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-
-class NoTracebackFilter(logging.Filter):
-    def filter(self, record):
-        record.exc_text = None
-        return True
-
-
-def setup_logger(log_file="app.log"):
-    log_dir = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "logs"
-    )
-    os.makedirs(log_dir, exist_ok=True)
-    log_path = os.path.join(log_dir, log_file)
-
-    logger = logging.getLogger("scout_ml")
-    logger.setLevel(logging.DEBUG)
-
-    file_handler = RotatingFileHandler(
-        log_path, maxBytes=1024 * 1024, backupCount=5
-    )
-    file_handler.setLevel(logging.DEBUG)
-
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
-
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+    # Create a file handler
+    file_handler = logging.FileHandler(log_file_path)
     file_handler.setFormatter(formatter)
-    console_handler.setFormatter(formatter)
+    file_handler.setLevel(log_level)
 
+    # Create a stream handler
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    stream_handler.setLevel(console_level)
+
+    # Add handlers to the logger
     logger.addHandler(file_handler)
-    logger.addHandler(console_handler)
-
-    # Add NoTracebackFilter to remove tracebacks from error logs
-    no_traceback_filter = NoTracebackFilter()
-    logger.addFilter(no_traceback_filter)
-    file_handler.addFilter(no_traceback_filter)
-    console_handler.addFilter(no_traceback_filter)
-
-    sys.stdout = StreamToLogger(logger, logging.INFO)
-    sys.stderr = StreamToLogger(logger, logging.ERROR)
+    logger.addHandler(stream_handler)
 
     return logger
 
+# Usage
+#logger = configure_logger('my_logger', 'logs/my_app.log')
 
-# Create and export the logger
-logger = setup_logger()
