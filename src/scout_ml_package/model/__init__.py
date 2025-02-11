@@ -3,7 +3,7 @@ from .base_model import (
     MultiOutputModel,
     ModelTrainer,
     TrainedModel,
-    PredictionVisualizer,
+    #PredictionVisualizer,
     ModelPipeline,
 )  # Import all necessary classes
 from .model_pipeline import (
@@ -19,7 +19,7 @@ __all__ = [
     # 'ModelLoader',
     "ModelPipeline",
     "TrainingPipeline",
-    "PredictionVisualizer",
+    #"PredictionVisualizer",
     "TrainedModel",
     "ModelHandlerInProd",
     "ModelManager",
