@@ -51,6 +51,143 @@ additional_ctime_ranges = {
 }
 
 
+# def get_prediction(model_manager, r):
+#     start_time = time.time()
+
+#     try:
+#         if r is not None:
+#             # Check if DataFrame is not empty before accessing elements
+#             if not r.empty:
+#                 jeditaskid = r["JEDITASKID"].values[0]
+#                 processor = PredictionPipeline(model_manager)
+#                 base_df = processor.preprocess_data(r)
+
+#                 # Model 1: RAMCOUNT
+#                 features = (
+#                     ["JEDITASKID"]
+#                     + processor.numerical_features
+#                     + processor.category_sequence
+#                 )
+#                 base_df.loc[:, "RAMCOUNT"] = (
+#                     processor.make_predictions_for_model(
+#                         "1", features, base_df
+#                     )
+#                 )
+#                 DataValidator.check_predictions(
+#                     base_df, "RAMCOUNT", acceptable_ranges
+#                 )
+
+#                 try:
+#                     DataValidator.check_predictions(base_df, "RAMCOUNT", acceptable_ranges)
+#                     logger.info("RAMCOUNT predictions validated successfully.")
+#                 except ValueError as ve:
+#                     logger.error(f"RAMCOUNT validation failed for JEDITASKID {jeditaskid}: {ve}")
+#                 except Exception as e:
+#                     logger.error(f"Unexpected error during RAMCOUNT validation for JEDITASKID {jeditaskid}: {e}")
+
+#                 # Model 2 and 3: cputime_HS
+#                 processor.numerical_features.append("RAMCOUNT")
+#                 features = (
+#                     ["JEDITASKID"]
+#                     + processor.numerical_features
+#                     + processor.category_sequence
+#                 )
+
+#                 if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
+#                     base_df.loc[:, "CTIME"] = (
+#                         processor.make_predictions_for_model(
+#                             "2", features, base_df
+#                         )
+#                     )
+#                 else:
+#                     base_df.loc[:, "CTIME"] = (
+#                         processor.make_predictions_for_model(
+#                             "3", features, base_df
+#                         )
+#                     )
+#                 DataValidator.check_predictions(
+#                     base_df, "CTIME", acceptable_ranges
+#                 )
+
+#                 try:
+#                     DataValidator.check_predictions(base_df, "CTIME", acceptable_ranges)
+#                     logger.info("CTIME predictions passed validation with default range.")
+#                 except ValueError as ve:
+#                     logger.warning(f"Validation failed with default range: {ve}")
+                    
+#                     # Attempt alternative ranges
+#                     try:
+#                         if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
+#                             DataValidator.check_predictions(base_df, "CTIME", {"CTIME": additional_ctime_ranges["low"]})
+#                             logger.info("Validation passed with low CTIME range.")
+#                         else:
+#                             DataValidator.check_predictions(base_df, "CTIME", {"CTIME": additional_ctime_ranges["high"]})
+#                             logger.info("Validation passed with high CTIME range.")
+#                     except ValueError as ve_alt:
+#                         logger.error(f"Validation failed with all ranges: {ve_alt}")
+                
+
+#                 # Model 4: CPU_EFF
+#                 processor.numerical_features.append("CTIME")
+#                 features = (
+#                     ["JEDITASKID"]
+#                     + processor.numerical_features
+#                     + processor.category_sequence
+#                 )
+#                 base_df.loc[:, "CPU_EFF"] = (
+#                     processor.make_predictions_for_model(
+#                         "4", features, base_df
+#                     )
+#                 )
+#                 DataValidator.check_predictions(
+#                     base_df, "CPU_EFF", acceptable_ranges
+#                 )
+
+#                 # Model 5: IOINTENSITY
+#                 processor.numerical_features.append("CPU_EFF")
+#                 features = (
+#                     ["JEDITASKID"]
+#                     + processor.numerical_features
+#                     + processor.category_sequence
+#                 )
+#                 base_df.loc[:, "IOINTENSITY"] = (
+#                     processor.make_predictions_for_model(
+#                         "5", features, base_df
+#                     )
+#                 )
+
+#                 logging.info(
+#                     f"JEDITASKID {jeditaskid} processed successfully in {time.time() - start_time:.2f} seconds"
+#                 )
+#                 base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']] = base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']].apply(lambda x: np.around(x, decimals=3))
+#                 return base_df
+
+#             else:
+#                 logger.error("DataFrame is empty for JEDITASKID.")
+#                 return None
+
+#         else:
+#             logger.error("Failed to process: Input data is None")
+#             return None
+
+#     except IndexError as ie:
+#         logger.error(f"IndexError occurred: {ie}")
+#         return None
+
+#     except ValueError as ve:
+#         jeditaskid = (
+#             "Unknown" if r is None or r.empty else r["JEDITASKID"].values[0]
+#         )
+#         logger.error(f"Check failed for JEDITASKID {jeditaskid}: {ve}")
+#         return None
+
+#     except Exception as e:
+#         jeditaskid = (
+#             "Unknown" if r is None or r.empty else r["JEDITASKID"].values[0]
+#         )
+#         logger.error(f"Error processing JEDITASKID {jeditaskid}: {str(e)}")
+#         return None
+
 def get_prediction(model_manager, r):
     start_time = time.time()
 
@@ -68,22 +205,16 @@ def get_prediction(model_manager, r):
                     + processor.numerical_features
                     + processor.category_sequence
                 )
-                base_df.loc[:, "RAMCOUNT"] = (
-                    processor.make_predictions_for_model(
-                        "1", features, base_df
-                    )
-                )
-                DataValidator.check_predictions(
-                    base_df, "RAMCOUNT", acceptable_ranges
-                )
-
                 try:
-                    DataValidator.check_predictions(base_df, "RAMCOUNT", acceptable_ranges)
-                    logger.info("RAMCOUNT predictions validated successfully.")
-                except ValueError as ve:
-                    logger.error(f"RAMCOUNT validation failed for JEDITASKID {jeditaskid}: {ve}")
+                    base_df.loc[:, "RAMCOUNT"] = (
+                        processor.make_predictions_for_model(
+                            "1", features, base_df
+                        )
+                    )
+                    DataValidator.validate_prediction(base_df, "RAMCOUNT", acceptable_ranges, jeditaskid)
                 except Exception as e:
-                    logger.error(f"Unexpected error during RAMCOUNT validation for JEDITASKID {jeditaskid}: {e}")
+                    logger.error(f"{jeditaskid}M1 failure: {str(e)}")
+                    return f"{jeditaskid}M1 failure: {str(e)}"
 
                 # Model 2 and 3: cputime_HS
                 processor.numerical_features.append("RAMCOUNT")
@@ -92,40 +223,27 @@ def get_prediction(model_manager, r):
                     + processor.numerical_features
                     + processor.category_sequence
                 )
-
-                if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
-                    base_df.loc[:, "CTIME"] = (
-                        processor.make_predictions_for_model(
-                            "2", features, base_df
-                        )
-                    )
-                else:
-                    base_df.loc[:, "CTIME"] = (
-                        processor.make_predictions_for_model(
-                            "3", features, base_df
-                        )
-                    )
-                DataValidator.check_predictions(
-                    base_df, "CTIME", acceptable_ranges
-                )
-
                 try:
-                    DataValidator.check_predictions(base_df, "CTIME", acceptable_ranges)
-                    logger.info("CTIME predictions passed validation with default range.")
-                except ValueError as ve:
-                    logger.warning(f"Validation failed with default range: {ve}")
-                    
-                    # Attempt alternative ranges
-                    try:
-                        if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
-                            DataValidator.check_predictions(base_df, "CTIME", {"CTIME": additional_ctime_ranges["low"]})
-                            logger.info("Validation passed with low CTIME range.")
-                        else:
-                            DataValidator.check_predictions(base_df, "CTIME", {"CTIME": additional_ctime_ranges["high"]})
-                            logger.info("Validation passed with high CTIME range.")
-                    except ValueError as ve_alt:
-                        logger.error(f"Validation failed with all ranges: {ve_alt}")
-                
+                    if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
+                        base_df.loc[:, "CTIME"] = (
+                            processor.make_predictions_for_model(
+                                "2", features, base_df
+                            )
+                        )
+                    else:
+                        base_df.loc[:, "CTIME"] = (
+                            processor.make_predictions_for_model(
+                                "3", features, base_df
+                            )
+                        )
+                    DataValidator.validate_ctime_prediction(base_df, jeditaskid, acceptable_ranges, additional_ctime_ranges)
+                except Exception as e:
+                    if base_df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
+                        logger.error(f"{jeditaskid}M2 failure: {str(e)}")
+                        return f"{jeditaskid}M2 failure: {str(e)}"
+                    else:
+                        logger.error(f"{jeditaskid}M3 failure: {str(e)}")
+                        return f"{jeditaskid}M3 failure: {str(e)}"
 
                 # Model 4: CPU_EFF
                 processor.numerical_features.append("CTIME")
@@ -134,14 +252,16 @@ def get_prediction(model_manager, r):
                     + processor.numerical_features
                     + processor.category_sequence
                 )
-                base_df.loc[:, "CPU_EFF"] = (
-                    processor.make_predictions_for_model(
-                        "4", features, base_df
+                try:
+                    base_df.loc[:, "CPU_EFF"] = (
+                        processor.make_predictions_for_model(
+                            "4", features, base_df
+                        )
                     )
-                )
-                DataValidator.check_predictions(
-                    base_df, "CPU_EFF", acceptable_ranges
-                )
+                    DataValidator.validate_prediction(base_df, "CPU_EFF", acceptable_ranges, jeditaskid)
+                except Exception as e:
+                    logger.error(f"{jeditaskid}M4 failure: {str(e)}")
+                    return f"{jeditaskid}M4 failure: {str(e)}"
 
                 # Model 5: IOINTENSITY
                 processor.numerical_features.append("CPU_EFF")
@@ -150,16 +270,20 @@ def get_prediction(model_manager, r):
                     + processor.numerical_features
                     + processor.category_sequence
                 )
-                base_df.loc[:, "IOINTENSITY"] = (
-                    processor.make_predictions_for_model(
-                        "5", features, base_df
+                try:
+                    base_df.loc[:, "IOINTENSITY"] = (
+                        processor.make_predictions_for_model(
+                            "5", features, base_df
+                        )
                     )
-                )
+                except Exception as e:
+                    logger.error(f"{jeditaskid}M5 failure: {str(e)}")
+                    return f"{jeditaskid}M5 failure: {str(e)}"
 
-                logging.info(
+                logger.info(
                     f"JEDITASKID {jeditaskid} processed successfully in {time.time() - start_time:.2f} seconds"
                 )
-                base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']] = base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']].apply(lambda x: np.around(x, decimals=3))
+                base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']] = base_df[['RAMCOUNT', 'CTIME', 'CPU_EFF']].round(3)
                 return base_df
 
             else:
@@ -187,6 +311,8 @@ def get_prediction(model_manager, r):
         )
         logger.error(f"Error processing JEDITASKID {jeditaskid}: {str(e)}")
         return None
+
+
 import pandas as pd
 if __name__ == "__main__":
     df = DummyData.fetch_data()
