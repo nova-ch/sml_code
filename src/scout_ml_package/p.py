@@ -2,6 +2,7 @@
 import time
 import logging
 import os
+import numpy as np
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
@@ -218,6 +219,7 @@ if __name__ == "__main__":
         # r = df[df['JEDITASKID'] == jeditaskid].copy()
         print(r)
         result = get_prediction(model_manager, r)
+        print(result)
      
         if result is not None:
             logging.info("Processing completed successfully")
