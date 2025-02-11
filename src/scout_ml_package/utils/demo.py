@@ -68,41 +68,68 @@ class DataValidator:
         except Exception as e:
             logger.error(f"Unexpected error during {column} validation for JEDITASKID {jeditaskid}: {e}")
             return False
-
+            
     @classmethod
-    def validate_ctime_prediction(cls, df, jeditaskid, acceptable_ranges, additional_ctime_ranges):
+    def validate_ctime_prediction(cls, df, jeditaskid, additional_ctime_ranges):
         """
-        Validates CTIME predictions with alternative ranges if necessary.
-
+        Validates CTIME predictions using alternative ranges.
+    
         Parameters:
         - df: DataFrame containing predictions.
         - jeditaskid: ID for logging purposes.
-        - acceptable_ranges: Default acceptable ranges for validation.
         - additional_ctime_ranges: Alternative ranges for CTIME validation.
-
+    
         Returns:
         - bool: True if validation succeeds, False otherwise.
         """
         try:
-            cls.check_predictions(df, "CTIME", acceptable_ranges)
-            logger.info("CTIME predictions passed validation with default range.")
-            return True
+            if df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
+                cls.check_predictions(df, "CTIME", {"CTIME": additional_ctime_ranges["low"]})
+                logger.info("Validation passed with low CTIME range.")
+                return True
+            else:
+                cls.check_predictions(df, "CTIME", {"CTIME": additional_ctime_ranges["high"]})
+                logger.info("Validation passed with high CTIME range.")
+                return True
         except ValueError as ve:
-            logger.warning(f"Validation failed with default range: {ve}")
+            logger.error(f"Validation failed with all ranges: {ve}")
+            return False
+
+    # @classmethod
+    # def validate_ctime_prediction(cls, df, jeditaskid, acceptable_ranges, additional_ctime_ranges):
+    #     """
+    #     Validates CTIME predictions with alternative ranges if necessary.
+
+    #     Parameters:
+    #     - df: DataFrame containing predictions.
+    #     - jeditaskid: ID for logging purposes.
+    #     - acceptable_ranges: Default acceptable ranges for validation.
+    #     - additional_ctime_ranges: Alternative ranges for CTIME validation.
+
+    #     Returns:
+    #     - bool: True if validation succeeds, False otherwise.
+    #     """
+    #     try:
+    #         cls.check_predictions(df, "CTIME", acceptable_ranges)
+    #         logger.info("CTIME predictions passed validation with default range.")
+    #         return True
+    #     except ValueError as ve:
+    #         logger.warning(f"Validation failed with default range: {ve}")
             
-            # Attempt alternative ranges
-            try:
-                if df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
-                    cls.check_predictions(df, "CTIME", {"CTIME": additional_ctime_ranges["low"]})
-                    logger.info("Validation passed with low CTIME range.")
-                    return True
-                else:
-                    cls.check_predictions(df, "CTIME", {"CTIME": additional_ctime_ranges["high"]})
-                    logger.info("Validation passed with high CTIME range.")
-                    return True
-            except ValueError as ve_alt:
-                logger.error(f"Validation failed with all ranges: {ve_alt}")
-                return False
+    #         # Attempt alternative ranges
+    #         try:
+    #             if df["CPUTIMEUNIT"].values[0] == "mHS06sPerEvent":
+    #                 cls.check_predictions(df, "CTIME", {"CTIME": additional_ctime_ranges["low"]})
+    #                 logger.info("Validation passed with low CTIME range.")
+    #                 return True
+    #             else:
+    #                 cls.check_predictions(df, "CTIME", {"CTIME": additional_ctime_ranges["high"]})
+    #                 logger.info("Validation passed with high CTIME range.")
+    #                 return True
+    #         except ValueError as ve_alt:
+    #             logger.error(f"Validation failed with all ranges: {ve_alt}")
+    #             return False
+
 
 
 
