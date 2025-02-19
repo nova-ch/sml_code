@@ -53,6 +53,7 @@ def preprocess_data(df):
     def convert_corecount(corecount):
         return "S" if corecount == 1 else "M"
 
+    df['CORE'] = df['CORECOUNT'].apply(convert_corecount)
     # Apply transformations
     df["P"] = df["PROCESSINGTYPE"].apply(convert_processingtype)
     df["F"] = df["TRANSHOME"].apply(convert_transhome)
@@ -94,11 +95,11 @@ def preprocess_data(df):
 
 
 base_path = "/data/model-data/"
-data = pd.read_parquet("/data/model-data/merged_files/c_task.parquet")
-dataset = pd.read_parquet("/data/model-data/merged_files/c_data.parquet")
-ceff = pd.read_parquet("/data/model-data/merged_files/c_eff.parquet")
-df_ = pd.merge(data, dataset, on="JEDITASKID", how="right")
-df_ = pd.merge(df_, ceff, on="JEDITASKID", how="left")
+data = pd.read_parquet("/data/model-data/merged_files/features.parquet")
+#dataset = pd.read_parquet("/data/model-data/merged_files/c_data.parquet")
+#ceff = pd.read_parquet("/data/model-data/merged_files/c_eff.parquet")
+#df_ = pd.merge(data, dataset, on="JEDITASKID", how="right")
+#df_ = pd.merge(df_, ceff, on="JEDITASKID", how="left")
 
 # # task_train_data_path = '/Users/tasnuvachowdhury/Desktop/projects/draft_projects/SML/local_data/training_historial.parquet'
 # task_train_data_path = (
@@ -113,13 +114,13 @@ df_ = pd.merge(df_, ceff, on="JEDITASKID", how="left")
 # training_data = processor.filtered_data()
 # future_data = new_preprocessor.filtered_data()
 
-df_ = preprocess_data(df_)
+df_ = preprocess_data(data)
 df_ = df_[
     (df_["PRODSOURCELABEL"].isin(["user", "managed"]))
-    & (df_["CTIME"] > 20)
-    & (df_["CTIME"] < 8000)
-    & (df_["RAMCOUNT"] < 10000)
-    & (df_["RAMCOUNT"] > 10)
+    & (df_["CTIME"] > 50)
+    & (df_["CTIME"] < 5000)
+    & (df_["RAMCOUNT"] < 8000)
+    & (df_["RAMCOUNT"] > 100)
     & (df_["CPUTIMEUNIT"] == "HS06sPerEvent")
 ]
 
@@ -165,8 +166,8 @@ selected_columns = [
     "DISTINCT_DATASETNAME_COUNT",
     "RAMCOUNT",
     "CTIME",
-    "CPU_EFF",
-    "IOINTENSITY",
+    #"CPU_EFF",
+    #"IOINTENSITY",
 ]
 
 print(training_data.shape)
@@ -208,7 +209,7 @@ tuned_model = pipeline.train_model(
     features_to_train,
     "build_cputime_high",
     epoch=50,
-    batch=100,
+    batch=300,
 )  # build_cputime
 predictions, y_pred = pipeline.regression_prediction(
     tuned_model, processed_future_data, features_to_train

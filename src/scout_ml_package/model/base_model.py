@@ -171,7 +171,7 @@ class MultiOutputModel:
         self.model = model
         return model
 
-    def build_cputime_high(self) -> Model:
+    def build_cputime_high_v1(self) -> Model:
         """Build and compile the model for CPU time prediction."""
         inputs = Input(shape=(self.input_shape,))
         x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
@@ -205,6 +205,38 @@ class MultiOutputModel:
             optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), # self.optimizer,#
             loss= self.loss_function,#self.weighted_mae, #
             metrics=["RootMeanSquaredError", "mean_absolute_error"],
+        )
+        self.model = model
+        return model
+    def build_cputime_high(self) -> Model:
+        """Build and compile the model for CPU time prediction."""
+        inputs = Input(shape=(self.input_shape,))
+        x = tf.keras.layers.Reshape((self.input_shape, 1))(inputs)
+
+        x = self._add_conv_block(
+            x, filters=512, kernel_size=5, activation="relu", pool_size=2
+        )
+        x = self._add_conv_block(
+            x, filters=128, kernel_size=3, activation="relu", pool_size=2
+        )
+
+        x = Flatten()(x)
+        x = self._add_dense_block(
+            x, units=512, dropout_rate=0.5, activation="relu"
+        )
+
+        x = self._add_dense_block(
+            x, units=256, dropout_rate=0.5, activation="relu"
+        )
+        x = self._add_dense_block(
+            x, units=128, dropout_rate=0.3, activation="relu"
+        )
+        outputs = Dense(self.output_shape, activation='linear')(x)
+        model = Model(inputs, outputs)
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=0.01), # self.optimizer,#
+            loss= self.loss_function,
+            metrics=["RootMeanSquaredError"],
         )
         self.model = model
         return model
